@@ -420,3 +420,20 @@ pre.val { margin: 0; font-size: 15px; padding: 12px 14px; background: var(--code
   .toasts { left: 16px; right: 16px; align-items: stretch; }
   .toast { max-width: none; }
 }
+
+/* ============ Teoría enriquecida ============ */
+.callout { margin: 0 0 12px; padding: 10px 14px; border-radius: 12px; font-size: 14px; border: 1px solid var(--border); background: var(--surface-2); }
+.callout.work { background: var(--brand-soft); border-color: color-mix(in srgb, var(--brand) 30%, transparent); }
+.callout.warn { background: var(--err-soft); border-color: color-mix(in srgb, var(--err) 30%, transparent); }
+.callout.tip { background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 30%, transparent); }
+.md-table { overflow-x: auto; margin: 0 0 12px; border: 1px solid var(--border); border-radius: 12px; }
+.md-table table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+.md-table th, .md-table td { padding: 7px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+.md-table th { background: var(--surface-2); color: var(--muted); font-weight: 600; }
+.md-table tr:last-child td { border-bottom: 0; }
+.sec-title { margin: 18px 0 2px; font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+.sec-title:first-child { margin-top: 0; }
+.ex-count { font-size: 12px; font-weight: 600; color: var(--muted); padding: 3px 9px; border-radius: 99px; background: var(--surface-3); }
+.plot { background: #fff; border-radius: 12px; padding: 8px; border: 1px solid var(--border); margin-bottom: 12px; text-align: center; }
+.plot img { max-width: 100%; height: auto; display: inline-block; }
+.out-body pre.val { margin-bottom: 4px; overflow-x: auto; }

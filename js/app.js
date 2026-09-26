@@ -15,14 +15,14 @@
   const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const LEVELS = [
-    ["Panda bebé", "🐼", 0], ["Curioso de datos", "🔎", 0.04], ["Domador de DataFrames", "🤠", 0.1],
-    ["Ninja del filtro", "🥷", 0.19], ["Mago del GroupBy", "🧙", 0.3], ["Arquitecto de joins", "🏗️", 0.43],
-    ["Analista de datos", "📊", 0.58], ["Ingeniero de datos", "⚙️", 0.75], ["Pandas Master", "👑", 0.92],
+    ["Panda bebé", "🐼", 0], ["Curioso de datos", "🔎", 0.04], ["Domador de Series", "🤠", 0.1],
+    ["Ninja de DataFrames", "🥷", 0.2], ["Mago de NumPy", "🧙", 0.32], ["Artista de gráficos", "🎨", 0.45],
+    ["Analista de datos", "📊", 0.6], ["Científico de datos jr", "🧪", 0.76], ["ML Master", "👑", 0.92],
   ].map(([n, e, f], i) => ({ n, e, i: i + 1, xp: Math.round((f * TOTAL_XP) / 10) * 10 }));
   const levelFor = (xp) => LEVELS.reduce((a, L) => (xp >= L.xp ? L : a), LEVELS[0]);
 
   /* ---------- Estado (localStorage) ---------- */
-  const KEY = "pq_state_v1";
+  const KEY = "pq_state_v2";
   const fresh = () => ({
     xp: 0, solved: {}, attempts: {}, hints: {}, code: {}, streak: { last: null, count: 0 },
     combo: 0, bestCombo: 0, badges: {}, day: { date: null, count: 0 }, sound: true,
@@ -54,13 +54,14 @@
     { id: "streak3", ico: "🔥", n: "En racha", d: "3 días seguidos practicando", ok: () => streakNow() >= 3 },
     { id: "streak7", ico: "📅", n: "Hábito de hierro", d: "7 días seguidos", ok: () => streakNow() >= 7 },
     { id: "nohint", ico: "🧠", n: "Cerebrito", d: "15 ejercicios sin pistas", ok: () => S.noHint >= 15 },
-    { id: "clean", ico: "🧹", n: "Limpiador", d: "Completa Limpieza de datos", ok: () => modDone("m05") },
-    { id: "joins", ico: "🔗", n: "Maestro de joins", d: "Completa Joins", ok: () => modDone("m07") },
-    { id: "sql", ico: "🗄️", n: "SQL + Pandas", d: "Completa Bases de datos", ok: () => modDone("m11") },
-    { id: "pro", ico: "🚀", n: "Nivel Pro", d: "Completa Nivel Pro", ok: () => modDone("m12") },
-    { id: "hired", ico: "💼", n: "¡Contratado!", d: "Supera los desafíos de entrevista", ok: () => modDone("m13") },
+    { id: "m01", ico: "🐼", n: "Pandero", d: "Completa el módulo Pandas", ok: () => modDone("m01") },
+    { id: "m02", ico: "📋", n: "Domador de tablas", d: "Completa DataFrames", ok: () => modDone("m02") },
+    { id: "m03", ico: "🔢", n: "Mente matricial", d: "Completa NumPy", ok: () => modDone("m03") },
+    { id: "m04", ico: "📈", n: "Pintor de datos", d: "Completa Matplotlib", ok: () => modDone("m04") },
+    { id: "m05", ico: "🎨", n: "Estadista visual", d: "Completa Seaborn", ok: () => modDone("m05") },
+    { id: "m06", ico: "🤖", n: "Primer modelo", d: "Completa Machine Learning", ok: () => modDone("m06") },
     { id: "night", ico: "🦉", n: "Búho nocturno", d: "Resuelve algo entre 00:00 y 05:00", ok: () => S.night },
-    { id: "all", ico: "👑", n: "Pandas Master", d: "Completa todo el curso", ok: () => nSolved() === ALL.length },
+    { id: "all", ico: "👑", n: "Data Master", d: "Completa todo el curso", ok: () => nSolved() === ALL.length },
   ];
 
   /* ---------- Sonido ---------- */
@@ -172,6 +173,25 @@
         out.push(codeBlock(buf.join("\n"), lang));
         continue;
       }
+      if (/^\s*\|/.test(l)) {
+        flush();
+        const rows = [];
+        while (i < lines.length && /^\s*\|/.test(lines[i])) rows.push(lines[i++]);
+        const cells = (r) => r.trim().replace(/^\||\|$/g, "").split(/(?<!\\)\|/).map((c) => inline(c.trim().replace(/\\\|/g, "|")));
+        const body = rows.filter((r) => !/^\s*\|[\s:|-]+\|\s*$/.test(r));
+        const [head, ...rest] = body;
+        out.push(`<div class="md-table"><table><thead><tr>${cells(head).map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${rest.map((r) => `<tr>${cells(r).map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);
+        continue;
+      }
+      if (l.startsWith("> ")) {
+        flush();
+        const buf = [];
+        while (i < lines.length && lines[i].startsWith("> ")) buf.push(lines[i++].slice(2));
+        const t = buf.join(" ");
+        const kind = t.startsWith("⚠️") ? "warn" : t.startsWith("💼") ? "work" : "tip";
+        out.push(`<div class="callout ${kind}">${inline(t)}</div>`);
+        continue;
+      }
       if (LI.test(l)) {
         flush();
         const ordered = /^\s*\d+\./.test(l), items = [];
@@ -196,6 +216,7 @@
   }
   function startWorker() {
     pyReady = false;
+    if (typeof libsReady !== "undefined") libsReady.clear();
     setPy("", "Cargando Python…");
     worker = new Worker("js/worker.js");
     worker.onmessage = (ev) => {
@@ -228,6 +249,14 @@
     });
   }
   const setupFor = (m) => D.setup + (m.setup || "");
+  const libsReady = new Set();
+  const libMsg = (m) => ({ packages: m.packages || [], pip: m.micropip || [] });
+  async function ensureMod(m) {
+    if (!(m.packages || m.micropip) || libsReady.has(m.id)) return {};
+    const r = await py(Object.assign({ type: "load" }, libMsg(m)), 300000);
+    if (!r.error) libsReady.add(m.id);
+    return r;
+  }
 
   /* ---------- Barra superior ---------- */
   function updateTop() {
@@ -282,13 +311,13 @@
     const unlocked = BADGES.filter((b) => S.badges[b.id]).length;
     const cta = next
       ? `<a class="btn primary" href="#/e/${next.id}">${done ? "▶ Continuar" : "▶ Empezar ahora"} <span class="kbd">${esc(next.title)}</span></a>`
-      : `<a class="btn primary" href="#/m/m13">👑 ¡Completaste todo! Repasar</a>`;
+      : `<a class="btn primary" href="#/m/m06">👑 ¡Completaste todo! Repasar</a>`;
     app.innerHTML = `<div class="page-enter">
       <section class="hero">
         <div class="hero-main">
-          <span class="eyebrow">🐍 Python · pandas · SQL</span>
-          <h1>Aprende pandas <span class="hl">resolviendo retos reales</span></h1>
-          <p class="lead">${ALL.length} ejercicios prácticos, de tu primer DataFrame a pipelines ETL con bases de datos. Escribe código, ejecútalo y recibe corrección al instante. Todo en el navegador o en Google Colab.</p>
+          <span class="eyebrow">🐍 Pandas · NumPy · Matplotlib · Seaborn · ML</span>
+          <h1>Aprende ciencia de datos <span class="hl">resolviendo retos reales</span></h1>
+          <p class="lead">${ALL.length} ejercicios prácticos en ${D.modules.length} módulos: de tu primera Series a tu primer modelo de Machine Learning. Escribe código, ejecútalo y recibe corrección al instante. Todo en el navegador o en Google Colab.</p>
           <div class="hero-cta">${cta}
             <a class="btn colab-btn" href="${D.modules[0].colab}" target="_blank" rel="noopener">Abrir en Colab ↗</a>
           </div>
@@ -308,7 +337,7 @@
         </div>
       </section>
 
-      <div class="section-title"><h2>🗺️ Tu ruta</h2><span>De cero a Data Engineer</span></div>
+      <div class="section-title"><h2>🗺️ Tu ruta</h2><span>De cero a tu primer modelo de ML</span></div>
       <div class="modules">${D.modules.map((m, i) => modCard(m, i)).join("")}</div>
 
       <div class="section-title"><h2>🏅 Logros</h2><span>${unlocked} de ${BADGES.length} desbloqueados</span></div>
@@ -316,13 +345,13 @@
 
       <div class="section-title"><h2>⚡ Cómo funciona</h2></div>
       <div class="steps">
-        <div class="step"><div class="n">1</div><h4>Lee y entiende</h4><p>Cada reto trae una mini-explicación con ejemplo y su equivalente en SQL.</p></div>
+        <div class="step"><div class="n">1</div><h4>Lee y entiende</h4><p>Cada reto explica el concepto con ejemplos, usos reales y errores comunes. Muchos incluyen su equivalente en SQL.</p></div>
         <div class="step"><div class="n">2</div><h4>Escribe y ejecuta</h4><p>Python y pandas reales corriendo en tu navegador. <b>Ctrl + Enter</b> para ejecutar.</p></div>
         <div class="step"><div class="n">3</div><h4>Gana XP y sube de nivel</h4><p>Combos, rachas y logros. ¿Prefieres Colab? Cada módulo tiene su notebook con corrector.</p></div>
       </div>
 
       <footer class="foot">
-        <span>🐼 PandasQuest · Hecho para aprender practicando</span>
+        <span>🐼 PandasQuest · Pandas, NumPy, Matplotlib, Seaborn y Machine Learning</span>
         <span><a href="https://github.com/rosalesluciano/pandas-quest" target="_blank" rel="noopener">GitHub</a> · <button class="reset-link" id="resetBtn">Reiniciar progreso</button></span>
       </footer>
     </div>`;
@@ -343,6 +372,7 @@
   function renderModule(m) {
     document.title = `${m.title} · PandasQuest`;
     const i = D.modules.indexOf(m), n = modSolved(m);
+    ensureMod(m);
     const next = m.exercises.find((e) => !S.solved[e.id]) || m.exercises[0];
     app.innerHTML = `<div class="page-enter">
       <div class="crumbs"><a href="#/">🗺️ Ruta</a> / <span>Módulo ${i + 1}</span></div>
@@ -353,7 +383,7 @@
         <a class="btn colab-btn" href="${m.colab}" target="_blank" rel="noopener">Abrir en Colab ↗</a>
       </div>
       <div class="mod-foot" style="--c:${m.color};margin-bottom:20px"><div class="bar"><i style="width:${(n / m.exercises.length) * 100}%"></i></div><span>${n}/${m.exercises.length} completados</span></div>
-      <div class="ex-list">${m.exercises.map((e, k) => `
+      <div class="ex-list">${m.exercises.map((e, k) => `${k === 0 || e.sec !== m.exercises[k - 1].sec ? `<h3 class="sec-title">${esc(e.sec)}</h3>` : ""}
         <a class="ex-row ${S.solved[e.id] ? "solved" : ""}" href="#/e/${e.id}">
           <span class="st">${S.solved[e.id] ? "✓" : k + 1}</span>
           <span class="t">${esc(e.title)}</span>
@@ -378,10 +408,10 @@
     const solved = !!S.solved[ex.id];
     app.innerHTML = `<div class="ex-page page-enter">
       <aside class="panel lesson">
-        <div class="crumbs"><a href="#/">🗺️ Ruta</a> / <a href="#/m/${m.id}">${m.icon} ${esc(m.title)}</a> / <span>${ex.ei + 1} de ${m.exercises.length}</span></div>
+        <div class="crumbs"><a href="#/">🗺️ Ruta</a> / <a href="#/m/${m.id}">${m.icon} ${esc(m.title)}</a> / <span>${esc(ex.sec)}</span></div>
         <div class="dots">${m.exercises.map((e) => `<a href="#/e/${e.id}" title="${esc(e.title)}" class="${S.solved[e.id] ? "solved" : ""} ${e === ex ? "current" : ""}"></a>`).join("")}</div>
         <h1>${esc(ex.title)}</h1>
-        <div class="meta"><span class="lvl lvl-${ex.level}">${D.levelNames[ex.level]}</span><span class="xp-tag">+${ex.xp} XP</span>${solved ? '<span class="lvl lvl-1">✓ Resuelto</span>' : ""}</div>
+        <div class="meta"><span class="ex-count">${ex.ei + 1}/${m.exercises.length}</span><span class="lvl lvl-${ex.level}">${D.levelNames[ex.level]}</span><span class="xp-tag">+${ex.xp} XP</span>${solved ? '<span class="lvl lvl-1">✓ Resuelto</span>' : ""}</div>
         <div class="md">${md(ex.theory)}</div>
         <div class="mission"><h3>🎯 Tu misión</h3><div class="md">${md(ex.task)}</div></div>
         <div class="tools">
@@ -395,7 +425,7 @@
       <section class="workspace">
         <div class="panel editor-card">
           <div class="editor-head">
-            <span class="file-tab"><i></i>solucion.py</span>
+            <span class="file-tab"><i></i>${m.id === "m06" ? "modelo" : m.title.toLowerCase()}.py</span>
             <div class="editor-actions">
               <button class="btn small ghost" id="resetCode" title="Volver al código inicial">↺ Reiniciar</button>
               <button class="btn small run" id="runBtn">▶ Ejecutar <span class="kbd">Ctrl+Enter</span></button>
@@ -445,6 +475,7 @@
     $("#tablesBtn").addEventListener("click", () => showTables(m));
     updateSolBtn(ex);
     if (S.hints[ex.id] >= 1 && !solved) showHint(ex, true);
+    ensureMod(m);
   }
 
   function updateSolBtn(ex) {
@@ -482,19 +513,22 @@
   }
 
   async function showTables(m) {
-    modal(`<div class="modal-top"><h2>📋 Tablas disponibles</h2><button class="btn small" data-close>Cerrar</button></div>
+    modal(`<div class="modal-top"><h2>📋 Datos disponibles</h2><button class="btn small" data-close>Cerrar</button></div>
       <div class="tabs" id="tblTabs">${m.tables.map((t, i) => `<button class="tab ${i ? "" : "on"}" data-t="${t}">${t}</button>`).join("")}</div>
       <div id="tblBody"><div class="placeholder"><span class="big">⏳</span>${pyReady ? "Cargando tablas…" : "Esperando a que Python termine de cargar…"}</div></div>
-      ${m.sql ? '<p style="margin:12px 0 0;font-size:13px">En este módulo también tienes <code>conn</code>: una base SQLite con las tablas <code>clientes</code>, <code>productos</code> y <code>pedidos</code>.</p>' : ""}`,
+      ${(m.packages || []).includes("sqlite3") ? '<p style="margin:12px 0 0;font-size:13px">En este módulo también tienes <code>conn</code>: una base SQLite con las tablas <code>clientes</code>, <code>productos</code> y <code>pedidos</code>.</p>' : ""}`,
     "", async (card) => {
       const key = m.id;
-      if (!tablesCache[key]) tablesCache[key] = await py({ type: "tables", setup: setupFor(m), names: m.tables, sql: m.sql });
+      if (!tablesCache[key]) {
+        await ensureMod(m);
+        tablesCache[key] = await py(Object.assign({ type: "tables", setup: setupFor(m), names: m.tables }, libMsg(m)), 120000);
+      }
       const data = tablesCache[key];
       if (!card.isConnected || !$("#tblBody", card)) return;
       if (data.error) { $("#tblBody", card).innerHTML = `<p>Error: ${esc(data.error.msg)}</p>`; delete tablesCache[key]; return; }
       const show = (t) => {
         const d = data[t];
-        $("#tblBody", card).innerHTML = `<p class="dtypes"><b>${t}</b> · ${d.shape[0]} filas × ${d.shape[1]} columnas<br>${esc(d.dtypes)}</p><div class="table-wrap">${d.html}</div>`;
+        $("#tblBody", card).innerHTML = `<p class="dtypes"><b>${t}</b> · ${esc(d.info)}<br>${esc(d.dtypes)}</p>${d.html}`;
         card.querySelectorAll(".tab").forEach((b) => b.classList.toggle("on", b.dataset.t === t));
       };
       card.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => show(b.dataset.t)));
@@ -517,8 +551,15 @@
     $("#runBar").className = "running-bar";
     const code = cm.getValue();
     S.code[ex.id] = code; save();
+    if ((ex.mod.packages || ex.mod.micropip) && !libsReady.has(ex.mod.id)) {
+      btn.innerHTML = "⏳ Cargando librerías…";
+      const lr = await ensureMod(ex.mod);
+      if (!$("#runBtn") || !cm) { running = false; return; }
+      if (lr.error) { running = false; btn.disabled = false; btn.innerHTML = '▶ Ejecutar <span class="kbd">Ctrl+Enter</span>'; $("#runBar").className = ""; showResult(ex, lr); return; }
+      btn.innerHTML = "⏳ Ejecutando…";
+    }
     const t0 = performance.now();
-    const r = await py({ type: "run", setup: setupFor(ex.mod), code, solution: ex.solution, check: ex.check, sql: ex.mod.sql }, ex.mod.sql ? 45000 : 30000);
+    const r = await py(Object.assign({ type: "run", setup: setupFor(ex.mod), code, solution: ex.solution, check: ex.check }, libMsg(ex.mod)), 60000);
     running = false;
     if (!$("#runBtn") || !cm) return;
     btn.disabled = false;
@@ -550,7 +591,8 @@
     }
     let body = verdict;
     if (r.stdout) body += `<p class="label">Salida (print)</p><pre class="stdout">${esc(r.stdout)}</pre>`;
-    if (r.display) body += `<p class="label">Tu resultado</p><div class="table-wrap">${r.display}</div>`;
+    if (r.images && r.images.length) body += `<p class="label">Tu gráfico</p>${r.images.map((b) => `<div class="plot"><img alt="Gráfico generado por tu código" src="data:image/png;base64,${b}"></div>`).join("")}`;
+    if (r.display) body += `<p class="label">Tu resultado</p>${r.display}`;
     if (!body) body = '<div class="placeholder">Sin salida.</div>';
     out.innerHTML = body;
     const nb = $("#nextBtn");

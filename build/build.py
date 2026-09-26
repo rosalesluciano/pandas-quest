@@ -10,7 +10,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "build"))
 
-from content import LEVEL_NAMES, MODULES, SETUP, TABLES, XP_BY_LEVEL  # noqa: E402
+from content import LEVEL_NAMES, MODULES, SETUP, XP_BY_LEVEL  # noqa: E402
 
 REPO = "rosalesluciano/pandas-quest"
 SITE = "https://rosalesluciano.github.io/pandas-quest/"
@@ -26,15 +26,16 @@ def build_data():
         exs = []
         for ex in m["exercises"]:
             exs.append({
-                "id": ex["id"], "title": ex["title"], "level": ex["level"],
+                "id": ex["id"], "sec": ex["sec"], "title": ex["title"], "level": ex["level"],
                 "xp": XP_BY_LEVEL[ex["level"]], "theory": ex["theory"], "task": ex["task"],
                 "starter": ex["starter"], "solution": ex["solution"], "hint": ex["hint"],
                 "sql": ex.get("sql", ""), "check": ex.get("check", {}),
             })
         mods.append({
             "id": m["id"], "title": m["title"], "icon": m["icon"], "color": m["color"],
-            "desc": m["desc"], "setup": m.get("setup", ""), "sql": m.get("sql", False),
-            "tables": TABLES + m.get("extra_tables", []), "colab": colab_url(m["id"]),
+            "desc": m["desc"], "setup": m.get("setup", ""),
+            "packages": m.get("packages", []), "micropip": m.get("micropip", []),
+            "tables": m["tables"], "colab": colab_url(m["id"]),
             "exercises": exs,
         })
     data = {"setup": SETUP, "modules": mods, "levelNames": LEVEL_NAMES}
@@ -63,6 +64,7 @@ def reiniciar_datos():
     """Vuelve a cargar todas las tablas limpias (cada ejercicio empieza de cero)."""
     globals().pop("resultado", None)
     exec(_SETUP, globals())
+    pq_prepare()
 
 def _codigo_celda():
     try:
@@ -74,12 +76,14 @@ def _codigo_celda():
 
 def comprobar(ej):
     info = _SOL[ej]
-    exp_ns = {}
-    exec(_SETUP, exp_ns)
-    exec(info["solution"], exp_ns)
+    def esperado():
+        exp_ns = {}
+        exec(_SETUP, exp_ns)
+        exec(info["solution"], exp_ns)
+        return exp_ns
     g = globals()
     g["_pq_code"] = _codigo_celda()
-    ok, msg = pq_check(g, exp_ns, info["check"])
+    ok, msg = pq_check(g, esperado, info["check"])
     if ok:
         from IPython.display import HTML, display
         display(HTML('<div style="padding:12px 16px;border-radius:12px;background:#0f9d6e;color:#fff;'
@@ -109,7 +113,7 @@ def build_notebooks():
         sols = {ex["id"]: {"solution": ex["solution"], "check": ex.get("check", {}),
                            "xp": XP_BY_LEVEL[ex["level"]]} for ex in m["exercises"]}
         b64 = base64.b64encode(json.dumps(sols, ensure_ascii=False).encode("utf-8")).decode()
-        tablas = TABLES + m.get("extra_tables", []) + (["conn (SQLite)"] if m.get("sql") else [])
+        tablas = m["tables"] + (["conn (SQLite)"] if "sqlite3" in m.get("packages", []) else [])
         setup_cell = (
             "#@title ⚙️ 1) Ejecuta esta celda primero (carga datos y corrector) { display-mode: \"form\" }\n"
             + core + "\n\n_SETUP = " + repr(setup) + "\n_SOL_B64 = " + repr(b64)
@@ -125,12 +129,16 @@ def build_notebooks():
                     "¿Atascado? `ver_solucion(\"id\")` muestra la solución (¡pero inténtalo antes! 😉)"),
             code_cell(setup_cell, form=True),
         ]
+        prev_sec = None
         for n, ex in enumerate(m["exercises"], 1):
+            if ex["sec"] != prev_sec:
+                cells.append(md_cell(f"---\n# 📌 {ex['sec']}"))
+                prev_sec = ex["sec"]
             nivel = LEVEL_NAMES[ex["level"]]
-            md = (f"---\n## {n}. {ex['title']}\n`{nivel}` · **+{XP_BY_LEVEL[ex['level']]} XP**\n\n"
+            md = (f"## {n}. {ex['title']}\n`{nivel}` · **+{XP_BY_LEVEL[ex['level']]} XP**\n\n"
                   f"{ex['theory']}\n\n### 🎯 Tu misión\n{ex['task']}\n\n"
-                  f"<details><summary>💡 Pista</summary>\n\n`{ex['hint']}`\n</details>\n\n"
-                  f"<details><summary>🗄️ Equivalente en SQL</summary>\n\n```sql\n{ex['sql']}\n```\n</details>")
+                  f"<details><summary>💡 Pista</summary>\n\n`{ex['hint']}`\n</details>"
+                  + (f"\n\n<details><summary>🗄️ Equivalente en SQL</summary>\n\n```sql\n{ex['sql']}\n```\n</details>" if ex.get("sql") else ""))
             cells.append(md_cell(md))
             cells.append(code_cell(f"reiniciar_datos()  # empieza con los datos limpios\n\n{ex['starter']}\n\ncomprobar(\"{ex['id']}\")"))
         cells.append(md_cell(f"---\n# 🏁 ¡Módulo completado!\nVuelve a [PandasQuest]({SITE}) para sumar tus XP y seguir con el siguiente módulo. 🚀"))

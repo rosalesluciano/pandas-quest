@@ -25,7 +25,7 @@ def main():
         print("ejercicios:", len(ids))
 
         # 1) Plantilla inicial del primer ejercicio: debe fallar con mensaje amigable
-        page.goto(URL + "#/e/m03e2")
+        page.goto(URL + "#/e/df06")
         page.wait_for_selector(".CodeMirror")
         page.evaluate("window.__pq.cm.setValue(\"resultado = clientes[clientes['pais'] == 'España' and clientes['edad'] > 3]\")")
         page.click("#runBtn")
@@ -34,26 +34,26 @@ def main():
         assert "ambiguous" in txt and "&" in txt, txt
         page.screenshot(path=os.path.join(SHOTS, "error.png"))
 
-        # 2) Resolver todos con la solución oficial
+        # 2) Resolver todos con la solución oficial (la 1ª carga de seaborn/sklearn tarda)
         for i, ex_id in enumerate(ids):
             page.goto(URL + f"#/e/{ex_id}")
             page.wait_for_selector(".CodeMirror")
             # la plantilla no debe aprobar
             page.evaluate(f"window.__pq.cm.setValue(window.__pq.BY_ID['{ex_id}'].starter)")
             page.click("#runBtn")
-            page.wait_for_selector("#runBtn:not([disabled])", timeout=60000)
+            page.wait_for_selector("#runBtn:not([disabled])", timeout=300000)
             page.wait_for_selector(".verdict, .placeholder", timeout=60000)
             if page.query_selector(".verdict.ok"):
                 fails.append(f"{ex_id}: la plantilla aprueba")
             # solución
             page.evaluate(f"window.__pq.cm.setValue(window.__pq.BY_ID['{ex_id}'].solution)")
             page.click("#runBtn")
-            page.wait_for_selector("#runBtn:not([disabled])", timeout=60000)
+            page.wait_for_selector("#runBtn:not([disabled])", timeout=300000)
             page.wait_for_selector(".verdict", timeout=60000)
             if not page.query_selector(".verdict.ok"):
                 fails.append(f"{ex_id}: {page.inner_text('.verdict')[:300]}")
-            if ex_id == "m07e5":
-                page.screenshot(path=os.path.join(SHOTS, "success.png"))
+            if ex_id in ("df23", "plt10", "sns10", "ml10"):
+                page.screenshot(path=os.path.join(SHOTS, f"ok_{ex_id}.png"), full_page=True)
             # los modales de nivel/módulo aparecen tras la celebración: esperar y cerrarlos
             page.wait_for_timeout(1300)
             while page.query_selector("#modal:not(.hidden)"):
@@ -65,7 +65,7 @@ def main():
         print("estado final:", st)
 
         # 3) Modal de tablas
-        page.goto(URL + "#/e/m08e2")
+        page.goto(URL + "#/e/df27")
         page.wait_for_selector(".CodeMirror")
         page.click("#tablesBtn")
         page.wait_for_selector("#tblBody table.df", timeout=60000)
@@ -75,14 +75,14 @@ def main():
         page.keyboard.press("Escape")
 
         # 4) Bucle infinito: debe cortarse y reiniciar Python
-        page.goto(URL + "#/e/m01e1")
+        page.goto(URL + "#/e/pd01")
         page.wait_for_selector(".CodeMirror")
         page.evaluate("window.__pq.cm.setValue('while True:\\n    pass')")
         page.click("#runBtn")
         page.wait_for_selector(".verdict.bad", timeout=90000)
         assert "tardó demasiado" in page.inner_text(".verdict")
         page.wait_for_selector(".py-status.ready", timeout=180000)
-        page.evaluate("window.__pq.cm.setValue(window.__pq.BY_ID['m01e1'].solution)")
+        page.evaluate("window.__pq.cm.setValue(window.__pq.BY_ID['pd01'].solution)")
         page.click("#runBtn")
         page.wait_for_selector(".verdict.ok", timeout=60000)
         print("bucle infinito: ok")
@@ -99,14 +99,14 @@ def main():
         mp.wait_for_selector(".mod")
         mp.screenshot(path=os.path.join(SHOTS, "mobile_home.png"), full_page=True)
         overflow = mp.evaluate("document.documentElement.scrollWidth > window.innerWidth")
-        mp.goto(URL + "#/e/m06e3")
+        mp.goto(URL + "#/e/df19")
         mp.wait_for_selector(".CodeMirror")
         mp.screenshot(path=os.path.join(SHOTS, "mobile_ex.png"), full_page=True)
         overflow2 = mp.evaluate("document.documentElement.scrollWidth > window.innerWidth")
         if overflow or overflow2:
             fails.append(f"scroll horizontal en móvil: home={overflow} ejercicio={overflow2}")
         lp = b.new_page(viewport={"width": 1400, "height": 900}, color_scheme="light")
-        lp.goto(URL + "#/e/m04e5")
+        lp.goto(URL + "#/e/np10")
         lp.wait_for_selector(".CodeMirror")
         lp.screenshot(path=os.path.join(SHOTS, "exercise_light.png"))
         b.close()

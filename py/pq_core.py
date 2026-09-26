@@ -88,8 +88,32 @@ def _scalar_eq(u, e):
         return False
 
 
+def _array_compare(u, e):
+    if isinstance(u, (pd.DataFrame, pd.Series)):
+        u = u.to_numpy()
+    try:
+        ua = np.asarray(u)
+    except Exception:
+        return False, f"Se esperaba un array de NumPy y tu resultado es {_tipo(u)}."
+    if not isinstance(u, np.ndarray) and not isinstance(u, (list, tuple)):
+        return False, f"Se esperaba un array de NumPy y tu resultado es {_tipo(u)}."
+    if ua.shape != e.shape:
+        return False, f"Forma distinta: tu array tiene shape {ua.shape} y se esperaba {e.shape}."
+    num = np.issubdtype(e.dtype, np.number) or e.dtype == bool
+    try:
+        if num and (np.issubdtype(ua.dtype, np.number) or ua.dtype == bool):
+            ok = np.allclose(ua.astype(float), e.astype(float), rtol=1e-6, atol=1e-6, equal_nan=True)
+        else:
+            ok = ua.tolist() == e.tolist()
+    except Exception:
+        ok = False
+    return (True, "") if ok else (False, "La forma es correcta pero los valores no coinciden. Revisa el cálculo.")
+
+
 def pq_compare(u, e, ordered=True, ignore_index=False):
     """Devuelve (ok, mensaje)."""
+    if isinstance(e, np.ndarray):
+        return _array_compare(u, e)
     if isinstance(e, (pd.DataFrame, pd.Series)):
         if not isinstance(u, type(e)):
             extra = ""
@@ -148,17 +172,80 @@ def pq_compare(u, e, ordered=True, ignore_index=False):
     return False, f"Tu resultado es {u!r}, pero no es el valor esperado."
 
 
-def pq_check(ns, exp_ns, opts):
-    """Evalúa el ejercicio. ns = namespace del alumno, exp_ns = namespace de la solución."""
+# ---------------------------------------------------------------- gráficos
+def _plt():
+    import matplotlib.pyplot as plt
+    return plt
+
+
+def _fig():
+    plt = _plt()
+    return plt.gcf() if plt.get_fignums() else None
+
+
+def _ax(i=0):
+    f = _fig()
+    if f is None or len(f.axes) <= i:
+        raise LookupError("no hay ningún gráfico dibujado")
+    return f.axes[i]
+
+
+def _legend(ax=None):
+    ax = ax or _ax()
+    lg = ax.get_legend()
+    return [t.get_text() for t in lg.get_texts()] if lg else []
+
+
+def _heights(ax=None):
+    return [round(float(p.get_height()), 6) for p in (ax or _ax()).patches]
+
+
+def _widths(ax=None):
+    return [round(float(p.get_width()), 6) for p in (ax or _ax()).patches]
+
+
+def _xticks(ax=None):
+    return [t.get_text() for t in (ax or _ax()).get_xticklabels()]
+
+
+def _hex(color):
+    import matplotlib.colors as mcolors
+    return mcolors.to_hex(color)
+
+
+_HELPERS = {"_fig": _fig, "_ax": _ax, "_legend": _legend, "_heights": _heights,
+            "_widths": _widths, "_xticks": _xticks, "_hex": _hex}
+
+
+def pq_prepare():
+    """Deja matplotlib limpio antes de ejecutar código (si está cargado)."""
+    import sys
+    if "matplotlib.pyplot" in sys.modules:
+        plt = sys.modules["matplotlib.pyplot"]
+        plt.close("all")
+        plt.show = lambda *a, **k: None
+
+
+def pq_check(ns, get_expected, opts):
+    """Evalúa el ejercicio.
+
+    ns = namespace del alumno. get_expected = función que devuelve el namespace de la
+    solución (solo se ejecuta si hace falta, para no pisar los gráficos del alumno).
+    """
     custom = opts.get("custom")
     if custom:
+        if opts.get("plot") and _fig() is None:
+            return False, "Todavía no hay ningún gráfico. ¡Dibuja algo! 🎨"
+        env = dict(_HELPERS)
+        env.update(ns)
         try:
-            ok = bool(eval(custom, ns))
+            ok = bool(eval(custom, env))
         except Exception as err:
-            return False, f"Aún no funciona: {type(err).__name__}: {err}"
+            return False, f"{opts.get('custom_msg', 'Todavía no es correcto.')} ({type(err).__name__}: {err})"
         return ok, "" if ok else opts.get("custom_msg", "Todavía no es correcto. ¡Sigue intentándolo!")
     if "resultado" not in ns:
         return False, "Guarda tu respuesta en la variable `resultado`."
+    exp_ns = get_expected() if callable(get_expected) else get_expected
     return pq_compare(ns["resultado"], exp_ns["resultado"],
                       ordered=opts.get("ordered", True),
                       ignore_index=opts.get("ignore_index", False))
