@@ -611,4 +611,37 @@ solution="resumen = clientes.groupby('pais', as_index=False).agg(n_clientes=('cl
 hint="clientes.groupby('pais', as_index=False).agg(n_clientes=('cliente_id', 'count'))",
 sql="CREATE TABLE resumen_pais AS\nSELECT pais, COUNT(*) AS n_clientes FROM clientes GROUP BY pais;",
 check={"ordered": False, "ignore_index": True}),
+
+dict(id="df34", sec="DataFrames y bases de datos", title="Cargar un script .sql", level=3,
+theory="""Cuando trabajas en **MySQL Workbench** no obtienes un archivo de base de datos: obtienes un **script `.sql`**, un texto con instrucciones `CREATE TABLE` e `INSERT`. Para analizarlo con pandas hay que **ejecutar** ese script en una base, y después consultarla.
+
+La librería `sqlite3` (viene con Python) crea una base con `connect` y ejecuta un script completo con `executescript`:
+
+```python
+import sqlite3
+
+with open("parcial.sql", encoding="utf-8") as f:
+    script = f.read()
+
+base = sqlite3.connect(":memory:")   # base en memoria (o "gimnasio.db" para un archivo)
+base.executescript(script)           # ejecuta TODAS las instrucciones
+df = pd.read_sql("SELECT * FROM socios", base)
+```
+
+SQLite no entiende algunas instrucciones que son exclusivas de MySQL. Hay que quitarlas o adaptarlas:
+
+| MySQL | SQLite |
+|---|---|
+| `CREATE DATABASE x;` y `USE x;` | no existen: el archivo **es** la base |
+| `id INT AUTO_INCREMENT PRIMARY KEY` | `id INTEGER PRIMARY KEY AUTOINCREMENT` |
+| `ENGINE=InnoDB` | no existe |
+
+El apunte de clase se conecta con SQLAlchemy, y el resultado es el mismo: `create_engine("sqlite:///gimnasio.db")` y después `pd.read_sql(consulta, engine)`.
+
+> 💼 **En el trabajo:** hacer las consultas pesadas en SQL y traer a pandas solo el resultado es la combinación más usada por analistas de datos.""",
+task="Crea una base en memoria, ejecuta el `script` con `executescript` y guarda en `resultado` (con `read_sql`) la **recaudación total por socio**: columnas `nombre` y `total`, ordenadas de mayor a menor total.",
+starter="import sqlite3\nscript = '''\nCREATE TABLE socios (id_socio INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT);\nCREATE TABLE pagos (id_pago INTEGER PRIMARY KEY AUTOINCREMENT, monto REAL, id_socio INTEGER);\nINSERT INTO socios (nombre) VALUES ('Alejandro'), ('María'), ('Carlos');\nINSERT INTO pagos (monto, id_socio) VALUES (10000, 1), (12000, 1), (15000, 2), (15000, 3), (12000, 3);\n'''\nbase = \n\nresultado = ",
+solution="import sqlite3\nscript = '''\nCREATE TABLE socios (id_socio INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT);\nCREATE TABLE pagos (id_pago INTEGER PRIMARY KEY AUTOINCREMENT, monto REAL, id_socio INTEGER);\nINSERT INTO socios (nombre) VALUES ('Alejandro'), ('María'), ('Carlos');\nINSERT INTO pagos (monto, id_socio) VALUES (10000, 1), (12000, 1), (15000, 2), (15000, 3), (12000, 3);\n'''\nbase = sqlite3.connect(':memory:')\nbase.executescript(script)\nresultado = pd.read_sql('''\n    SELECT s.nombre, SUM(p.monto) AS total\n    FROM socios s JOIN pagos p ON s.id_socio = p.id_socio\n    GROUP BY s.nombre\n    ORDER BY total DESC\n''', base)",
+hint="base = sqlite3.connect(':memory:')  ->  base.executescript(script)  ->  SELECT s.nombre, SUM(p.monto) AS total ... GROUP BY ... ORDER BY total DESC",
+sql="SELECT s.nombre, SUM(p.monto) AS total\nFROM socios s JOIN pagos p ON s.id_socio = p.id_socio\nGROUP BY s.nombre\nORDER BY total DESC;"),
 ]

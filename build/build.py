@@ -100,7 +100,7 @@ def ver_solucion(ej):
     print(_SOL[ej]["solution"])
 
 reiniciar_datos()
-print("✅ Datos cargados:", ", ".join(_TABLAS))
+print("✅ Listo." + (" Datos cargados: " + ", ".join(_TABLAS) if _TABLAS else " Ya puedes empezar."))
 '''
 
 
@@ -108,7 +108,8 @@ def build_notebooks():
     core = open(os.path.join(ROOT, "py", "pq_core.py"), encoding="utf-8").read()
     os.makedirs(os.path.join(ROOT, "notebooks"), exist_ok=True)
     paths = []
-    for idx, m in enumerate(MODULES, 1):
+    for m in MODULES:
+        idx = int(m['id'][1:])
         setup = SETUP + m.get("setup", "")
         sols = {ex["id"]: {"solution": ex["solution"], "check": ex.get("check", {}),
                            "xp": XP_BY_LEVEL[ex["level"]]} for ex in m["exercises"]}
@@ -120,7 +121,7 @@ def build_notebooks():
             + "\n_TABLAS = " + repr(tablas) + "\n" + NB_HELPERS
         )
         cells = [
-            md_cell(f"# {m['icon']} Módulo {idx}: {m['title']}\n\n{m['desc']}\n\n"
+            md_cell(f"# {m['icon']} Módulo {idx:02d}: {m['title']}\n\n{m['desc']}\n\n"
                     f"**PandasQuest** · versión web interactiva: [{SITE}]({SITE}#/m/{m['id']})\n\n"
                     "**Cómo funciona:**\n"
                     "1. Ejecuta la celda ⚙️ de abajo (carga las tablas y el corrector).\n"

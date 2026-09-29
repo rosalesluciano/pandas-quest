@@ -3,7 +3,7 @@
 
 EXERCISES = [
 # =========================================================== Series
-dict(id="pd01", sec="Series: la pieza básica", title="Hola, pandas 👋", level=1,
+dict(id="pd01", sec="Series: la pieza básica", title="Hola, pandas", level=1,
 theory="""**pandas** es la librería de Python para trabajar con datos en forma de tabla. Es la herramienta número uno de analistas, científicos e ingenieros de datos: con ella se leen archivos, se limpian datos, se calculan métricas y se preparan datos para modelos de Machine Learning.
 
 Todo en pandas se construye con dos piezas:
@@ -362,6 +362,115 @@ solution="resultado = clientes['pais'].value_counts()",
 hint="clientes['pais'].value_counts()",
 sql="SELECT pais, COUNT(*) FROM clientes GROUP BY pais ORDER BY 2 DESC;",
 check={"ordered": False}),
+
+# =========================================================== Estadística
+dict(id="st01", sec="Estadística descriptiva", title="Media vs mediana", level=1,
+theory="""La **media** (promedio) suma todos los valores y los divide por la cantidad. La **mediana** es el valor del **medio** cuando los datos están ordenados.
+
+Parecen lo mismo, pero no lo son. Mira este ejemplo clásico de sueldos:
+
+```python
+sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])
+sueldos.mean()      # 107857.14  -> inflada por un solo sueldo de 500.000
+sueldos.median()    # 45000.0    -> la mitad gana menos y la otra mitad más
+```
+
+Un solo valor extremo (el sueldo de un CEO, por ejemplo) arrastra la media hacia arriba, pero casi no mueve la mediana.
+
+> 💼 **En el trabajo:** con sueldos, precios de viviendas o montos de compras (datos con valores extremos) se informa la **mediana**. La media se usa cuando los datos son parejos y sin extremos.""",
+task="Guarda en `resultado` una lista con la **media** y la **mediana** de `sueldos`.",
+starter="sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nresultado = [ , ]",
+solution="sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nresultado = [sueldos.mean(), sueldos.median()]",
+hint="[sueldos.mean(), sueldos.median()]",
+sql="SELECT AVG(sueldo) FROM empleados;  -- la mediana no es estándar en SQL\n-- PostgreSQL: SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY sueldo) FROM empleados;"),
+
+dict(id="st02", sec="Estadística descriptiva", title="La moda", level=1,
+theory="""La **moda** es el valor que **más se repite**. Es la única medida de tendencia central que también sirve para datos de **texto** (categorías).
+
+```python
+talles = pd.Series(["M", "L", "M", "S", "M", "L"])
+talles.mode()        # 0    M   -> devuelve una Series
+talles.mode()[0]     # 'M'
+```
+
+`mode()` devuelve una **Series** y no un solo valor porque puede haber **empate**: si dos valores aparecen la misma cantidad de veces, los datos son **bimodales** y pandas devuelve los dos.
+
+```python
+pd.Series([10, 12, 12, 15, 15]).mode()   # 12 y 15
+```
+
+> 💼 **En el trabajo:** el talle más vendido, el producto más comprado o la respuesta más común de una encuesta son modas.""",
+task="Los `montos` son las cuotas que pagaron los socios de un gimnasio. Guarda en `resultado` la **lista** de modas (usa `.mode()` y conviértelo con `.tolist()`).",
+starter="montos = pd.Series([10000, 12000, 15000, 15000, 12000, 9500, 12000, 15000])\nresultado = ",
+solution="montos = pd.Series([10000, 12000, 15000, 15000, 12000, 9500, 12000, 15000])\nresultado = montos.mode().tolist()",
+hint="montos.mode().tolist()",
+sql="SELECT monto, COUNT(*) AS veces FROM pagos\nGROUP BY monto ORDER BY veces DESC;"),
+
+dict(id="st03", sec="Estadística descriptiva", title="Cuartiles", level=2,
+theory="""Los **cuartiles** dividen los datos ordenados en **cuatro partes iguales** (25% cada una):
+
+| Cuartil | Significado | pandas |
+|---|---|---|
+| **Q1** | el 25% de los datos está por debajo | `s.quantile(0.25)` |
+| **Q2** | el 50% está por debajo (**es la mediana**) | `s.quantile(0.50)` |
+| **Q3** | el 75% está por debajo | `s.quantile(0.75)` |
+
+```python
+s = pd.Series([10, 12, 12, 15, 18, 20, 22])
+s.quantile([0.25, 0.5, 0.75])    # 12.0, 15.0, 19.0
+```
+
+Con los sueldos del ejemplo, el 50% del medio de la gente gana entre Q1 y Q3: ese es el **rango típico**.
+
+> 💡 pandas calcula los cuartiles **interpolando** entre valores. Por eso a veces da un número que no está en los datos, o difiere un poco de lo que harías a mano. La conclusión es la misma.""",
+task="Guarda en `resultado` una lista con **Q1, Q2 y Q3** de `sueldos`.",
+starter="sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nresultado = ",
+solution="sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nresultado = [sueldos.quantile(0.25), sueldos.quantile(0.5), sueldos.quantile(0.75)]",
+hint="[sueldos.quantile(0.25), sueldos.quantile(0.5), sueldos.quantile(0.75)]"),
+
+dict(id="st04", sec="Estadística descriptiva", title="Detectar outliers con IQR", level=3,
+theory="""Un **outlier** (valor atípico) es un dato muy alejado del resto. Puede ser un error de carga o un caso especial real, y siempre hay que revisarlo.
+
+El **criterio de cuartiles** (el mismo que usan los diagramas de caja) dice:
+
+1. **IQR** = Q3 − Q1 → el ancho del 50% central
+2. **Límite inferior** = Q1 − 1.5 × IQR
+3. **Límite superior** = Q3 + 1.5 × IQR
+4. Todo lo que quede **afuera** de los límites es outlier.
+
+```python
+q1, q3 = s.quantile(0.25), s.quantile(0.75)
+iqr = q3 - q1
+outliers = s[(s < q1 - 1.5 * iqr) | (s > q3 + 1.5 * iqr)]
+```
+
+Con los sueldos de clase: Q1 = 37.500, Q3 = 52.500, IQR = 15.000 → rango normal de 15.000 a 75.000. El sueldo de **500.000** queda afuera: es el outlier.
+
+> ⚠️ Detectar un outlier no significa borrarlo. Primero entiende **por qué** está ahí.""",
+task="Calcula los límites con el criterio IQR y guarda en `resultado` la **Series** con los outliers de `sueldos`.",
+starter="sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nq1 = sueldos.quantile(0.25)\nq3 = sueldos.quantile(0.75)\niqr = \nresultado = ",
+solution="sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nq1 = sueldos.quantile(0.25)\nq3 = sueldos.quantile(0.75)\niqr = q3 - q1\nresultado = sueldos[(sueldos < q1 - 1.5 * iqr) | (sueldos > q3 + 1.5 * iqr)]",
+hint="sueldos[(sueldos < q1 - 1.5 * iqr) | (sueldos > q3 + 1.5 * iqr)]"),
+
+dict(id="st05", sec="Estadística descriptiva", title="Desviación estándar", level=2,
+theory="""La **desviación estándar** mide cuánto se alejan **típicamente** los datos de la media:
+
+- **Baja**: los datos están agrupados cerca de la media (son predecibles).
+- **Alta**: los datos están dispersos.
+
+```python
+pd.Series([5, 5, 5, 5]).std()       # 0.0   -> todos iguales
+pd.Series([2, 8]).std()             # 4.24  -> muy dispersos
+```
+
+Para comparar la dispersión de datos con escalas distintas (sueldos en pesos contra edades en años) se usa el **coeficiente de variación**: `std / mean`. Sin unidades, se puede comparar.
+
+> 💡 pandas calcula la desviación **muestral** (divide por n − 1). NumPy (`np.std`) usa por defecto la **poblacional** (divide por n). Por eso a veces dan distinto.""",
+task="Guarda en `resultado` el **coeficiente de variación** (`std / mean`) de las `edades` de un grupo, **redondeado a 3 decimales** con `round(valor, 3)`.",
+starter="edades = pd.Series([10, 12, 12, 15, 18, 20, 22])\nresultado = ",
+solution="edades = pd.Series([10, 12, 12, 15, 18, 20, 22])\nresultado = round(edades.std() / edades.mean(), 3)",
+hint="round(edades.std() / edades.mean(), 3)",
+sql="SELECT STDDEV(edad) / AVG(edad) FROM grupo;"),
 
 # =========================================================== Leer y guardar
 dict(id="pd18", sec="Leer y guardar datos", title="Leer un CSV", level=2,

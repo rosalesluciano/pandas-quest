@@ -3,10 +3,483 @@ window.PQ = {
  "setup": "import pandas as pd\nimport numpy as np\n\nclientes = pd.DataFrame({\n    \"cliente_id\": range(1, 13),\n    \"nombre\": [\"Ana\", \"Bruno\", \"Carla\", \"Diego\", \"Elena\", \"Facundo\",\n               \"Gabriela\", \"Hugo\", \"Inés\", \"Julián\", \"Karina\", \"Lucas\"],\n    \"ciudad\": [\"Madrid\", \"Buenos Aires\", \"CDMX\", \"Bogotá\", \"Madrid\", \"Lima\",\n               \"Buenos Aires\", \"CDMX\", \"Santiago\", \"Bogotá\", \"Madrid\", \"Lima\"],\n    \"pais\": [\"España\", \"Argentina\", \"México\", \"Colombia\", \"España\", \"Perú\",\n             \"Argentina\", \"México\", \"Chile\", \"Colombia\", \"España\", \"Perú\"],\n    \"edad\": [34, 28, 45, 23, 51, 39, 30, 27, 42, 36, 25, 48],\n    \"segmento\": [\"Premium\", \"Básico\", \"Premium\", \"Básico\", \"Premium\", \"Estándar\",\n                 \"Estándar\", \"Básico\", \"Premium\", \"Estándar\", \"Básico\", \"Estándar\"],\n    \"email\": [\"ana@mail.com\", None, \"carla@mail.com\", \"diego@mail.com\", None, \"facu@mail.com\",\n              \"gabi@mail.com\", None, \"ines@mail.com\", \"julian@mail.com\", \"kari@mail.com\", \"lucas@mail.com\"],\n    \"fecha_registro\": pd.to_datetime([\n        \"2023-01-15\", \"2023-02-03\", \"2023-02-20\", \"2023-03-11\", \"2023-04-02\", \"2023-05-19\",\n        \"2023-06-07\", \"2023-07-23\", \"2023-08-30\", \"2023-09-14\", \"2023-10-05\", \"2023-11-28\"]),\n})\n\nproductos = pd.DataFrame({\n    \"producto_id\": range(1, 11),\n    \"producto\": [\"Laptop\", \"Mouse\", \"Teclado\", \"Monitor\", \"Auriculares\",\n                 \"Webcam\", \"Silla gamer\", \"Escritorio\", \"Tablet\", \"Micrófono\"],\n    \"categoria\": [\"Computación\", \"Accesorios\", \"Accesorios\", \"Computación\", \"Audio\",\n                  \"Accesorios\", \"Muebles\", \"Muebles\", \"Computación\", \"Audio\"],\n    \"precio\": [1200.0, 25.5, 45.0, 300.0, 80.0, 60.0, 250.0, 180.0, 450.0, 95.0],\n    \"stock\": [5, 150, 80, 20, 60, 0, 12, 7, 15, 0],\n})\n\n_estados = [\"entregado\", \"enviado\", \"entregado\", \"cancelado\", \"entregado\", \"pendiente\"]\npedidos = pd.DataFrame({\n    \"pedido_id\": range(1001, 1031),\n    \"cliente_id\": [(i * 7) % 11 + 1 for i in range(29)] + [99],\n    \"producto_id\": [(i * 3) % 10 + 1 for i in range(30)],\n    \"cantidad\": [(i % 4) + 1 for i in range(30)],\n    \"fecha\": pd.date_range(\"2024-01-03\", periods=30, freq=\"5D\"),\n    \"estado\": [_estados[i % 6] for i in range(30)],\n})\n\nempleados = pd.DataFrame({\n    \"emp_id\": range(1, 11),\n    \"nombre\": [\"Marta\", \"Pablo\", \"Sofía\", \"Tomás\", \"Valeria\",\n               \"Andrés\", \"Lucía\", \"Martín\", \"Paula\", \"Ramiro\"],\n    \"depto\": [\"Dirección\", \"Ventas\", \"Ventas\", \"Ventas\", \"IT\",\n              \"IT\", \"IT\", \"Marketing\", \"Marketing\", \"Ventas\"],\n    \"salario\": [9000, 4200, 3900, 4000, 5200, 4800, 6100, 3700, 4100, 3500],\n    \"jefe_id\": pd.array([None, 1, 2, 2, 1, 5, 5, 1, 8, 2], dtype=\"Int64\"),\n    \"fecha_ingreso\": pd.to_datetime([\n        \"2015-03-01\", \"2018-06-15\", \"2019-01-10\", \"2020-09-01\", \"2017-11-20\",\n        \"2021-02-01\", \"2016-08-08\", \"2022-04-18\", \"2019-07-07\", \"2023-01-09\"]),\n})\n\n_i = np.arange(90)\n_f = pd.date_range(\"2024-01-01\", periods=90, freq=\"D\")\n_v = 1000 + 8 * _i + 250 * (_f.dayofweek >= 5) + ((_i * 37) % 11) * 20\n_v = np.where(np.isin(_i, [20, 55, 77]), _v + 1500, _v)\nventas_diarias = pd.DataFrame({\n    \"fecha\": _f,\n    \"ventas\": _v.astype(float),\n    \"visitas\": (300 + (_i * 13) % 97 + 2 * _i).astype(int),\n})\n\nsucio = pd.DataFrame({\n    \"id\": [1, 2, 2, 3, 4, 5, 6, 7],\n    \"nombre\": [\"  ana \", \"BRUNO\", \"BRUNO\", \"carla\", None, \"Diego  \", \"elena\", \"facundo\"],\n    \"edad\": [\"34\", \"28\", \"28\", \"n/d\", \"23\", \"51\", None, \"39\"],\n    \"ciudad\": [\"madrid\", \"Buenos Aires\", \"Buenos Aires\", \" santiago\", \"bogotá\", \"Madrid \", \"madrid\", \"LIMA\"],\n    \"monto\": [\"$1,200.50\", \"$300\", \"$300\", \"$45.00\", None, \"$80.5\", \"$99\", \"$1,000\"],\n})\ndel _i, _f, _v, _estados\n",
  "modules": [
   {
+   "id": "m00",
+   "title": "Python desde cero",
+   "icon": "🐍",
+   "color": "#e0700b",
+   "desc": "Variables, texto, listas, diccionarios, decisiones, bucles, funciones, errores y clases: la base para leer y escribir cualquier código.",
+   "setup": "",
+   "packages": [],
+   "micropip": [],
+   "tables": [],
+   "colab": "https://colab.research.google.com/github/rosalesluciano/pandas-quest/blob/main/notebooks/m00.ipynb",
+   "exercises": [
+    {
+     "id": "py01",
+     "sec": "Primeros pasos",
+     "title": "Hola, Python",
+     "level": 1,
+     "xp": 10,
+     "theory": "**Python** es el lenguaje número uno en ciencia de datos e inteligencia artificial. pandas, NumPy, scikit-learn, PyTorch… todo se escribe en Python. Antes de analizar datos, necesitas leer y escribir Python con soltura.\n\nUna **variable** es un nombre que guarda un valor. Se crea con `=` (se lee \"guarda en\"):\n\n```python\nnombre = \"Ana\"        # texto (string): entre comillas\nedad = 28             # número entero (int)\naltura = 1.65         # número decimal (float)\nprint(nombre, edad)   # print muestra valores en pantalla -> Ana 28\n```\n\nReglas para nombrar variables:\n- Letras minúsculas, números y guion bajo: `precio_final`, `total_2024`.\n- No pueden empezar con un número ni tener espacios.\n- Python distingue mayúsculas: `edad` y `Edad` son variables distintas.\n\n> 💡 En este curso, cada ejercicio se corrige mirando la variable `resultado`. Guarda siempre ahí tu respuesta.",
+     "task": "Crea la variable `ciudad` con el texto `'Córdoba'` y la variable `habitantes` con el número `1_500_000` (el guion bajo solo facilita la lectura). Después guarda en `resultado` la variable `habitantes`.",
+     "starter": "# Escribe tu código aquí 👇\nciudad = \nhabitantes = \nresultado = ",
+     "solution": "ciudad = 'Córdoba'\nhabitantes = 1_500_000\nresultado = habitantes",
+     "hint": "habitantes = 1_500_000  y luego  resultado = habitantes",
+     "sql": "",
+     "check": {
+      "custom": "ciudad == 'Córdoba' and resultado == 1500000",
+      "custom_msg": "Revisa que `ciudad` sea 'Córdoba' y que `resultado` tenga los habitantes (1500000)."
+     }
+    },
+    {
+     "id": "py02",
+     "sec": "Primeros pasos",
+     "title": "Tipos de datos",
+     "level": 1,
+     "xp": 10,
+     "theory": "Cada valor en Python tiene un **tipo**. Los cuatro básicos son:\n\n| Tipo | Qué guarda | Ejemplo |\n|---|---|---|\n| `int` | números enteros | `42`, `-7` |\n| `float` | números decimales | `3.14`, `0.5` |\n| `str` | texto | `\"hola\"`, `'Python'` |\n| `bool` | verdadero o falso | `True`, `False` |\n\nLa función `type()` te dice el tipo de cualquier valor:\n\n```python\ntype(42)        # <class 'int'>\ntype(\"42\")      # <class 'str'>  ← ¡con comillas es texto!\ntype(4.0)       # <class 'float'>\n```\n\nPara quedarte solo con el nombre del tipo: `type(42).__name__` devuelve `'int'`.\n\n> 💼 **En el trabajo:** la mitad de los errores al limpiar datos son de tipo: números que llegaron como texto (`\"1200\"`) o fechas que llegaron como `str`.",
+     "task": "Guarda en `resultado` una **lista** con los nombres de los tipos de estos cuatro valores, en este orden: `7`, `7.5`, `'7'`, `True`. Usa `type(valor).__name__`.",
+     "starter": "resultado = [type(7).__name__, ]",
+     "solution": "resultado = [type(7).__name__, type(7.5).__name__, type('7').__name__, type(True).__name__]",
+     "hint": "[type(7).__name__, type(7.5).__name__, type('7').__name__, type(True).__name__]",
+     "sql": "",
+     "check": {
+      "custom": "resultado == ['int', 'float', 'str', 'bool']",
+      "custom_msg": "Deben ser 4 nombres de tipo en orden: int, float, str, bool."
+     }
+    },
+    {
+     "id": "py03",
+     "sec": "Primeros pasos",
+     "title": "La calculadora de Python",
+     "level": 1,
+     "xp": 10,
+     "theory": "Python calcula como una calculadora, con algunos operadores extra muy útiles:\n\n| Operador | Qué hace | Ejemplo | Resultado |\n|---|---|---|---|\n| `+ - * /` | suma, resta, multiplicación, división | `7 / 2` | `3.5` |\n| `//` | división entera (sin decimales) | `7 // 2` | `3` |\n| `%` | resto de la división (módulo) | `7 % 2` | `1` |\n| `**` | potencia | `2 ** 3` | `8` |\n\nSe respetan las reglas matemáticas: primero potencias, luego `* / // %`, y al final `+ -`. Usa paréntesis para cambiar el orden.\n\n```python\nminutos = 135\nhoras = minutos // 60      # 2\nresto = minutos % 60       # 15\n```\n\n> 💡 `%` sirve para saber si un número es par: `n % 2 == 0`.",
+     "task": "Un video dura `500` segundos. Calcula cuántos **minutos completos** tiene y cuántos **segundos sobran**. Guarda en `resultado` una lista `[minutos, segundos]`.",
+     "starter": "duracion = 500\nminutos = \nsegundos = \nresultado = [minutos, segundos]",
+     "solution": "duracion = 500\nminutos = duracion // 60\nsegundos = duracion % 60\nresultado = [minutos, segundos]",
+     "hint": "minutos = duracion // 60   y   segundos = duracion % 60",
+     "sql": "",
+     "check": {
+      "custom": "resultado == [8, 20]",
+      "custom_msg": "500 segundos son 8 minutos y 20 segundos. Usa // y %."
+     }
+    },
+    {
+     "id": "py04",
+     "sec": "Primeros pasos",
+     "title": "Convertir tipos",
+     "level": 2,
+     "xp": 20,
+     "theory": "Muchas veces un número llega como texto (por ejemplo, desde un formulario o un archivo). Con texto no se puede calcular: `\"10\" + \"5\"` da `\"105\"`, porque **pega** los textos.\n\nPara convertir entre tipos se usan funciones con el nombre del tipo:\n\n```python\nint(\"42\")       # 42     texto -> entero\nfloat(\"3.5\")    # 3.5    texto -> decimal\nstr(100)        # \"100\"  número -> texto\nint(9.99)       # 9      corta los decimales (no redondea)\nround(9.99, 1)  # 10.0   redondea a 1 decimal\n```\n\n> ⚠️ `int(\"3.5\")` da error: primero pásalo a `float` y después a `int`.",
+     "task": "Los precios llegaron como texto. Conviértelos a números decimales y guarda en `resultado` la **suma** de los dos.",
+     "starter": "precio_a = '1250.50'\nprecio_b = '749.50'\nresultado = precio_a + precio_b   # ⚠️ esto pega textos",
+     "solution": "precio_a = '1250.50'\nprecio_b = '749.50'\nresultado = float(precio_a) + float(precio_b)",
+     "hint": "float(precio_a) + float(precio_b)",
+     "sql": "",
+     "check": {
+      "custom": "isinstance(resultado, (int, float)) and abs(resultado - 2000.0) < 1e-9",
+      "custom_msg": "El resultado debe ser el número 2000.0. ¿Convertiste los dos textos con float()?"
+     }
+    },
+    {
+     "id": "py05",
+     "sec": "Texto (strings)",
+     "title": "f-strings: texto con variables",
+     "level": 1,
+     "xp": 10,
+     "theory": "Las **f-strings** son la forma moderna de meter variables dentro de un texto. Se escribe una `f` antes de las comillas y cada variable va entre llaves `{}`:\n\n```python\nnombre = \"Ana\"\nedad = 28\nf\"{nombre} tiene {edad} años\"          # 'Ana tiene 28 años'\nf\"El año que viene tendrá {edad + 1}\"  # dentro de {} puede ir cualquier cálculo\n```\n\nTambién sirven para dar formato a los números:\n\n```python\nprecio = 1234.5678\nf\"${precio:.2f}\"     # '$1234.57'   -> 2 decimales\nf\"{precio:,.0f}\"     # '1,235'      -> separador de miles, sin decimales\nf\"{0.256:.1%}\"       # '25.6%'      -> como porcentaje\n```\n\n> 💼 **En el trabajo:** los reportes, los mensajes de log y los títulos de gráficos se arman con f-strings.",
+     "task": "Con las variables dadas, guarda en `resultado` exactamente el texto: `Luciano aprobó con 8.75 puntos` (la nota con **2 decimales**).",
+     "starter": "alumno = 'Luciano'\nnota = 8.7512\nresultado = ",
+     "solution": "alumno = 'Luciano'\nnota = 8.7512\nresultado = f'{alumno} aprobó con {nota:.2f} puntos'",
+     "hint": "f'{alumno} aprobó con {nota:.2f} puntos'",
+     "sql": "",
+     "check": {
+      "custom": "resultado == 'Luciano aprobó con 8.75 puntos'",
+      "custom_msg": "El texto debe ser exactamente: Luciano aprobó con 8.75 puntos"
+     }
+    },
+    {
+     "id": "py06",
+     "sec": "Texto (strings)",
+     "title": "Limpiar texto",
+     "level": 1,
+     "xp": 10,
+     "theory": "Los textos tienen **métodos**: funciones que se escriben después de un punto. Los más usados para limpiar datos:\n\n| Método | Qué hace | Ejemplo |\n|---|---|---|\n| `.strip()` | quita espacios al inicio y al final | `\"  hola \".strip()` → `'hola'` |\n| `.lower()` / `.upper()` | minúsculas / mayúsculas | `\"Hola\".upper()` → `'HOLA'` |\n| `.title()` | primera letra de cada palabra en mayúscula | `\"buenos aires\".title()` → `'Buenos Aires'` |\n| `.replace(a, b)` | reemplaza `a` por `b` | `\"1.200\".replace(\".\", \"\")` → `'1200'` |\n\nLos métodos se pueden **encadenar**: se aplican de izquierda a derecha.\n\n```python\n\"  JUAN pérez \".strip().title()   # 'Juan Pérez'\n```\n\n> ⚠️ Los strings son **inmutables**: `.upper()` no cambia la variable original, devuelve un texto nuevo. Por eso se guarda el resultado: `nombre = nombre.upper()`.",
+     "task": "Limpia el texto `sucio`: quítale los espacios de los extremos y déjalo con formato de título. Guarda el texto limpio en `resultado`.",
+     "starter": "sucio = '   sAN miguel de TUCUMÁN  '\nresultado = sucio",
+     "solution": "sucio = '   sAN miguel de TUCUMÁN  '\nresultado = sucio.strip().title()",
+     "hint": "sucio.strip().title()",
+     "sql": "",
+     "check": {
+      "custom": "resultado == 'San Miguel De Tucumán'",
+      "custom_msg": "Debe quedar 'San Miguel De Tucumán': usa .strip() y .title()."
+     }
+    },
+    {
+     "id": "py07",
+     "sec": "Texto (strings)",
+     "title": "Índices y recortes",
+     "level": 2,
+     "xp": 20,
+     "theory": "Un texto es una **secuencia** de caracteres, y cada uno tiene una posición (índice) que **empieza en 0**:\n\n```\n texto =  P  y  t  h  o  n\n índice:  0  1  2  3  4  5\nnegativo: -6 -5 -4 -3 -2 -1\n```\n\n```python\ntexto = \"Python\"\ntexto[0]      # 'P'    primer carácter\ntexto[-1]     # 'n'    último carácter\ntexto[0:3]    # 'Pyt'  del 0 al 3 (el 3 NO se incluye)\ntexto[2:]     # 'thon' desde el 2 hasta el final\ntexto[:2]     # 'Py'   desde el inicio hasta el 2\nlen(texto)    # 6      cantidad de caracteres\n```\n\nEsta notación `[inicio:fin]` se llama **slicing** y funciona igual en listas, arrays de NumPy y (con `iloc`) en pandas. Vale la pena dominarla ahora.",
+     "task": "El código de producto `'ARG-2024-00731'` tiene el país en los **primeros 3** caracteres y el número de serie en los **últimos 5**. Guarda en `resultado` una lista `[pais, serie]`.",
+     "starter": "codigo = 'ARG-2024-00731'\npais = \nserie = \nresultado = [pais, serie]",
+     "solution": "codigo = 'ARG-2024-00731'\npais = codigo[:3]\nserie = codigo[-5:]\nresultado = [pais, serie]",
+     "hint": "codigo[:3]  y  codigo[-5:]",
+     "sql": "",
+     "check": {
+      "custom": "resultado == ['ARG', '00731']",
+      "custom_msg": "Debe quedar ['ARG', '00731']. Recuerda: [:3] y [-5:]."
+     }
+    },
+    {
+     "id": "py08",
+     "sec": "Texto (strings)",
+     "title": "Separar y unir",
+     "level": 2,
+     "xp": 20,
+     "theory": "Dos métodos que vas a usar todo el tiempo:\n\n- `texto.split(sep)` **corta** un texto en una lista, usando `sep` como separador.\n- `sep.join(lista)` hace lo contrario: **une** una lista de textos usando `sep` entre cada uno.\n\n```python\nfila = \"Ana;28;Córdoba\"\npartes = fila.split(\";\")      # ['Ana', '28', 'Córdoba']\n\npalabras = [\"ciencia\", \"de\", \"datos\"]\n\" \".join(palabras)            # 'ciencia de datos'\n\"-\".join(palabras)            # 'ciencia-de-datos'\n```\n\n> 💼 **En el trabajo:** así se procesan líneas de un CSV a mano, se arman rutas o se generan identificadores.",
+     "task": "Convierte el email `'luciano.rosales@datos.com'` en el usuario `'luciano_rosales'`: toma la parte **antes** de la `@` y reemplaza el punto por guion bajo usando `split` y `join`.",
+     "starter": "email = 'luciano.rosales@datos.com'\nusuario = email.split('@')[0]    # 'luciano.rosales'\nresultado = ",
+     "solution": "email = 'luciano.rosales@datos.com'\nusuario = email.split('@')[0]\nresultado = '_'.join(usuario.split('.'))",
+     "hint": "'_'.join(usuario.split('.'))",
+     "sql": "",
+     "check": {
+      "custom": "resultado == 'luciano_rosales'",
+      "custom_msg": "Debe quedar 'luciano_rosales'."
+     }
+    },
+    {
+     "id": "py09",
+     "sec": "Listas y tuplas",
+     "title": "Tu primera lista",
+     "level": 1,
+     "xp": 10,
+     "theory": "Una **lista** guarda varios valores en orden, entre corchetes `[]` y separados por comas. Puede tener cualquier tipo de dato:\n\n```python\nventas = [120, 95, 143, 88, 170]\nventas[0]        # 120  primer elemento\nventas[-1]       # 170  último\nventas[1:3]      # [95, 143]\nlen(ventas)      # 5\n```\n\nFunciones útiles con listas de números:\n\n```python\nsum(ventas)      # 616\nmax(ventas)      # 170\nmin(ventas)      # 88\nsum(ventas) / len(ventas)   # 123.2 -> promedio\n```\n\n> 💡 Las listas son **mutables**: se pueden cambiar después de creadas (`ventas[0] = 130`).",
+     "task": "Con la lista `temperaturas`, guarda en `resultado` una lista con tres valores: la **máxima**, la **mínima** y el **promedio** (suma dividida por la cantidad).",
+     "starter": "temperaturas = [18.5, 22.0, 25.5, 19.0, 30.0]\nresultado = [ , , ]",
+     "solution": "temperaturas = [18.5, 22.0, 25.5, 19.0, 30.0]\nresultado = [max(temperaturas), min(temperaturas), sum(temperaturas) / len(temperaturas)]",
+     "hint": "[max(temperaturas), min(temperaturas), sum(temperaturas) / len(temperaturas)]",
+     "sql": "",
+     "check": {
+      "custom": "len(resultado) == 3 and resultado[0] == 30.0 and resultado[1] == 18.5 and abs(resultado[2] - 23.0) < 1e-9",
+      "custom_msg": "Deben ser 3 valores: máxima (30.0), mínima (18.5) y promedio (23.0)."
+     }
+    },
+    {
+     "id": "py10",
+     "sec": "Listas y tuplas",
+     "title": "Modificar listas",
+     "level": 2,
+     "xp": 20,
+     "theory": "Las listas tienen métodos para agregar, quitar y ordenar:\n\n| Método | Qué hace |\n|---|---|\n| `lista.append(x)` | agrega `x` al final |\n| `lista.insert(i, x)` | inserta `x` en la posición `i` |\n| `lista.remove(x)` | quita el primer `x` que encuentra |\n| `lista.pop()` | quita y devuelve el último |\n| `lista.sort()` | ordena la lista (de menor a mayor) |\n| `lista.sort(reverse=True)` | ordena de mayor a menor |\n\n```python\ntareas = [\"limpiar\", \"analizar\"]\ntareas.append(\"graficar\")     # ['limpiar', 'analizar', 'graficar']\ntareas.insert(0, \"cargar\")    # ['cargar', 'limpiar', 'analizar', 'graficar']\n```\n\n> ⚠️ `lista.sort()` modifica la lista y devuelve `None`. Si escribes `x = lista.sort()`, `x` queda vacío. Para obtener una lista nueva ordenada sin tocar la original usa `sorted(lista)`.",
+     "task": "A la lista `notas` agrégale un `9` al final, quítale el `2` (fue un error de carga) y ordénala de **mayor a menor**. Guarda la lista final en `resultado`.",
+     "starter": "notas = [7, 2, 10, 6, 8]\n\nresultado = notas",
+     "solution": "notas = [7, 2, 10, 6, 8]\nnotas.append(9)\nnotas.remove(2)\nnotas.sort(reverse=True)\nresultado = notas",
+     "hint": "notas.append(9)  notas.remove(2)  notas.sort(reverse=True)",
+     "sql": "",
+     "check": {
+      "custom": "resultado == [10, 9, 8, 7, 6]",
+      "custom_msg": "La lista final debe ser [10, 9, 8, 7, 6]."
+     }
+    },
+    {
+     "id": "py11",
+     "sec": "Listas y tuplas",
+     "title": "Tuplas y desempaquetado",
+     "level": 2,
+     "xp": 20,
+     "theory": "Una **tupla** es como una lista pero **inmutable** (no se puede modificar). Se escribe con paréntesis:\n\n```python\ncoordenadas = (-31.42, -64.18)   # latitud, longitud de Córdoba\ncoordenadas[0]                    # -31.42\n```\n\nSe usan para datos que van juntos y no deberían cambiar. Y permiten el **desempaquetado**: repartir los valores en varias variables de una sola vez.\n\n```python\nlat, lon = coordenadas            # lat = -31.42, lon = -64.18\nnombre, edad, ciudad = (\"Ana\", 28, \"Lima\")\na, b = b, a                       # truco: intercambia dos variables\n```\n\n> 💼 **En el trabajo:** lo vas a ver en todos lados. Por ejemplo, `df.shape` devuelve una tupla `(filas, columnas)` y en ML se escribe `X_train, X_test, y_train, y_test = train_test_split(...)`.",
+     "task": "La tupla `dimensiones` tiene `(filas, columnas)` de una tabla. Desempaquétala en las variables `filas` y `columnas`, y guarda en `resultado` la **cantidad total de celdas**.",
+     "starter": "dimensiones = (1500, 12)\n\nresultado = ",
+     "solution": "dimensiones = (1500, 12)\nfilas, columnas = dimensiones\nresultado = filas * columnas",
+     "hint": "filas, columnas = dimensiones",
+     "sql": "",
+     "check": {
+      "custom": "filas == 1500 and columnas == 12 and resultado == 18000",
+      "custom_msg": "Desempaqueta con `filas, columnas = dimensiones` y multiplica (resultado: 18000)."
+     }
+    },
+    {
+     "id": "py12",
+     "sec": "Diccionarios y conjuntos",
+     "title": "Diccionarios",
+     "level": 1,
+     "xp": 10,
+     "theory": "Un **diccionario** guarda pares **clave: valor** entre llaves `{}`. En lugar de buscar por posición, buscas por **clave**:\n\n```python\nsocio = {\"nombre\": \"Ana\", \"edad\": 28, \"plan\": \"Premium\"}\nsocio[\"nombre\"]            # 'Ana'\nsocio[\"edad\"] = 29         # modifica un valor\nsocio[\"email\"] = \"a@m.com\" # agrega una clave nueva\nsocio.get(\"telefono\", \"sin dato\")   # 'sin dato' -> get no da error si falta la clave\nlist(socio.keys())         # ['nombre', 'edad', 'plan', 'email']\n```\n\n> 💼 **En el trabajo:** es la estructura más importante después de la lista. Un JSON de una API es un diccionario, cada fila de una base de datos se puede ver como uno, y `pd.DataFrame(dict)` crea tablas a partir de diccionarios.",
+     "task": "Al diccionario `producto`: cambia el `precio` a `1100`, agrega la clave `'stock'` con valor `8`, y guarda en `resultado` el diccionario completo.",
+     "starter": "producto = {'nombre': 'Monitor', 'precio': 1000}\n\nresultado = producto",
+     "solution": "producto = {'nombre': 'Monitor', 'precio': 1000}\nproducto['precio'] = 1100\nproducto['stock'] = 8\nresultado = producto",
+     "hint": "producto['precio'] = 1100   y   producto['stock'] = 8",
+     "sql": "",
+     "check": {
+      "custom": "resultado == {'nombre': 'Monitor', 'precio': 1100, 'stock': 8}",
+      "custom_msg": "El diccionario debe quedar {'nombre': 'Monitor', 'precio': 1100, 'stock': 8}."
+     }
+    },
+    {
+     "id": "py13",
+     "sec": "Diccionarios y conjuntos",
+     "title": "Recorrer un diccionario",
+     "level": 2,
+     "xp": 20,
+     "theory": "Con `.items()` recorres un diccionario obteniendo **clave y valor** a la vez:\n\n```python\nstock = {\"mouse\": 40, \"teclado\": 15, \"monitor\": 3}\nfor producto, cantidad in stock.items():\n    print(f\"{producto}: {cantidad}\")\n```\n\nOtras formas útiles:\n\n```python\nsum(stock.values())              # 58 -> suma de todos los valores\nmax(stock, key=stock.get)        # 'mouse' -> la clave con el valor más alto\n\"monitor\" in stock               # True -> ¿existe esa clave?\n```\n\n> 💡 `in` sobre un diccionario busca entre las **claves**, no entre los valores.",
+     "task": "`ventas` tiene las ventas de cada vendedor. Guarda en `resultado` una lista con el **total vendido** y el **nombre del vendedor que más vendió**.",
+     "starter": "ventas = {'Sofía': 1200, 'Tomás': 950, 'Valeria': 1430, 'Andrés': 870}\nresultado = [ , ]",
+     "solution": "ventas = {'Sofía': 1200, 'Tomás': 950, 'Valeria': 1430, 'Andrés': 870}\nresultado = [sum(ventas.values()), max(ventas, key=ventas.get)]",
+     "hint": "[sum(ventas.values()), max(ventas, key=ventas.get)]",
+     "sql": "",
+     "check": {
+      "custom": "resultado == [4450, 'Valeria']",
+      "custom_msg": "Deben ser el total (4450) y el mejor vendedor ('Valeria')."
+     }
+    },
+    {
+     "id": "py14",
+     "sec": "Diccionarios y conjuntos",
+     "title": "Conjuntos: valores únicos",
+     "level": 2,
+     "xp": 20,
+     "theory": "Un **conjunto** (`set`) guarda valores **sin repetir** y sin orden. Es la forma más rápida de eliminar duplicados o comparar grupos:\n\n```python\nciudades = [\"Lima\", \"Quito\", \"Lima\", \"Bogotá\", \"Quito\"]\nset(ciudades)                    # {'Lima', 'Quito', 'Bogotá'}\nlen(set(ciudades))               # 3 -> cuántos valores distintos hay\n\na = {\"python\", \"sql\", \"excel\"}\nb = {\"python\", \"sql\", \"tableau\"}\na & b    # {'python', 'sql'}        intersección: están en los dos\na | b    # los 4 sin repetir        unión\na - b    # {'excel'}                están en a pero no en b\n```\n\n> 💼 **En el trabajo:** \"¿qué clientes compraron en enero pero no en febrero?\" se responde con una resta de conjuntos. Es la misma idea que un LEFT JOIN con `IS NULL` en SQL.",
+     "task": "Guarda en `resultado` una lista **ordenada alfabéticamente** con los clientes que compraron en `enero` pero **no** en `febrero`.",
+     "starter": "enero = ['Ana', 'Bruno', 'Carla', 'Diego', 'Ana']\nfebrero = ['Bruno', 'Elena', 'Diego']\nresultado = ",
+     "solution": "enero = ['Ana', 'Bruno', 'Carla', 'Diego', 'Ana']\nfebrero = ['Bruno', 'Elena', 'Diego']\nresultado = sorted(set(enero) - set(febrero))",
+     "hint": "sorted(set(enero) - set(febrero))",
+     "sql": "",
+     "check": {
+      "custom": "resultado == ['Ana', 'Carla']",
+      "custom_msg": "Deben quedar ['Ana', 'Carla'], ordenados y sin repetir."
+     }
+    },
+    {
+     "id": "py15",
+     "sec": "Decisiones con if",
+     "title": "if, elif y else",
+     "level": 1,
+     "xp": 10,
+     "theory": "`if` ejecuta un bloque de código **solo si** se cumple una condición. `elif` (\"si no, si…\") agrega más condiciones y `else` cubre todo lo demás:\n\n```python\ntemperatura = 31\nif temperatura > 30:\n    estado = \"calor\"\nelif temperatura > 15:\n    estado = \"templado\"\nelse:\n    estado = \"frío\"\n```\n\nDos cosas clave de Python:\n- Después de la condición van **dos puntos** `:`.\n- El bloque se marca con **sangría** (4 espacios). La sangría no es decoración: define qué código está dentro del `if`.\n\nComparaciones: `==` (igual), `!=` (distinto), `>`, `<`, `>=`, `<=`.\n\n> ⚠️ `=` guarda un valor; `==` compara. `if x = 5:` da error.",
+     "task": "Clasifica la `nota`: `'Promociona'` si es 8 o más, `'Aprueba'` si es 6 o más, y `'Recupera'` en otro caso. Guarda el texto en `resultado`.",
+     "starter": "nota = 7\n\nresultado = ",
+     "solution": "nota = 7\nif nota >= 8:\n    resultado = 'Promociona'\nelif nota >= 6:\n    resultado = 'Aprueba'\nelse:\n    resultado = 'Recupera'",
+     "hint": "if nota >= 8: ... elif nota >= 6: ... else: ...",
+     "sql": "",
+     "check": {
+      "custom": "resultado == 'Aprueba' and 'if' in _pq_code and 'elif' in _pq_code",
+      "custom_msg": "Con nota 7 debe dar 'Aprueba'. Usa if / elif / else."
+     }
+    },
+    {
+     "id": "py16",
+     "sec": "Decisiones con if",
+     "title": "Condiciones combinadas",
+     "level": 2,
+     "xp": 20,
+     "theory": "Para combinar condiciones se usan `and`, `or` y `not`:\n\n| Operador | Es verdadero si… |\n|---|---|\n| `a and b` | se cumplen **las dos** |\n| `a or b` | se cumple **al menos una** |\n| `not a` | `a` es falsa |\n\n```python\nedad, socio = 25, True\nif edad >= 18 and socio:\n    print(\"Puede entrar\")\n\ndia = \"sáb\"\nes_finde = dia in [\"sáb\", \"dom\"]    # in: ¿está en la lista?\n```\n\n> 💡 En Python puedes encadenar comparaciones como en matemática: `18 <= edad <= 65`.",
+     "task": "Un cliente recibe descuento si gastó **más de 50000** y es `premium`, **o** si es su `primera_compra`. Guarda en `resultado` el booleano (`True`/`False`) de si recibe descuento.",
+     "starter": "gasto = 62000\npremium = False\nprimera_compra = True\nresultado = ",
+     "solution": "gasto = 62000\npremium = False\nprimera_compra = True\nresultado = (gasto > 50000 and premium) or primera_compra",
+     "hint": "(gasto > 50000 and premium) or primera_compra",
+     "sql": "",
+     "check": {
+      "custom": "resultado is True and 'or' in _pq_code and 'and' in _pq_code",
+      "custom_msg": "Combina las condiciones con `and` y `or`. Con estos datos el resultado es True."
+     }
+    },
+    {
+     "id": "py17",
+     "sec": "Bucles",
+     "title": "for y range",
+     "level": 1,
+     "xp": 10,
+     "theory": "Un bucle `for` **repite** un bloque para cada elemento de una secuencia:\n\n```python\nfor fruta in [\"manzana\", \"pera\", \"uva\"]:\n    print(fruta)\n```\n\n`range()` genera secuencias de números:\n\n```python\nrange(5)          # 0, 1, 2, 3, 4      (el 5 no se incluye)\nrange(1, 6)       # 1, 2, 3, 4, 5\nrange(0, 10, 2)   # 0, 2, 4, 6, 8      (de 2 en 2)\n```\n\nEl patrón **acumulador** es clásico: una variable empieza en 0 y el bucle le va sumando.\n\n```python\ntotal = 0\nfor n in range(1, 4):\n    total = total + n     # o total += n\n# total = 6\n```",
+     "task": "Usando un bucle `for` con `range`, suma los **números pares del 2 al 100** (ambos incluidos). Guarda la suma en `resultado`.",
+     "starter": "total = 0\n# tu bucle aquí 👇\n\nresultado = total",
+     "solution": "total = 0\nfor n in range(2, 101, 2):\n    total += n\nresultado = total",
+     "hint": "for n in range(2, 101, 2):\n    total += n",
+     "sql": "",
+     "check": {
+      "custom": "resultado == 2550 and 'for' in _pq_code",
+      "custom_msg": "La suma de los pares del 2 al 100 es 2550. Usa un bucle for."
+     }
+    },
+    {
+     "id": "py18",
+     "sec": "Bucles",
+     "title": "Recorrer y contar",
+     "level": 2,
+     "xp": 20,
+     "theory": "Combinando `for` con `if` puedes **filtrar** y **contar** mientras recorres una lista:\n\n```python\nedades = [15, 32, 17, 45, 22]\nmayores = []\nfor e in edades:\n    if e >= 18:\n        mayores.append(e)\n# mayores = [32, 45, 22]\n```\n\nDos palabras clave para controlar el bucle:\n- `break`: sale del bucle inmediatamente.\n- `continue`: salta a la siguiente vuelta.\n\n> 💼 **En el trabajo:** en pandas casi nunca harás esto con bucles (hay formas vectorizadas mucho más rápidas), pero entender el bucle es lo que te permite entender qué hace pandas por dentro.",
+     "task": "Recorre `pagos` y guarda en `resultado` una lista con los montos **mayores a 10000**, en el mismo orden.",
+     "starter": "pagos = [8000, 12000, 15000, 9500, 10000, 11000]\naltos = []\n# tu bucle aquí 👇\n\nresultado = altos",
+     "solution": "pagos = [8000, 12000, 15000, 9500, 10000, 11000]\naltos = []\nfor p in pagos:\n    if p > 10000:\n        altos.append(p)\nresultado = altos",
+     "hint": "for p in pagos:\n    if p > 10000:\n        altos.append(p)",
+     "sql": "",
+     "check": {
+      "custom": "resultado == [12000, 15000, 11000]",
+      "custom_msg": "Deben quedar [12000, 15000, 11000] (10000 no es mayor a 10000)."
+     }
+    },
+    {
+     "id": "py19",
+     "sec": "Bucles",
+     "title": "while: repetir hasta que…",
+     "level": 2,
+     "xp": 20,
+     "theory": "`while` repite un bloque **mientras** una condición sea verdadera. Se usa cuando no sabes de antemano cuántas vueltas vas a dar:\n\n```python\nsaldo = 100\nmeses = 0\nwhile saldo < 200:\n    saldo = saldo * 1.10     # crece un 10% por mes\n    meses += 1\n# meses = 8\n```\n\n> ⚠️ Si la condición nunca se vuelve falsa, el bucle no termina nunca (**bucle infinito**). Asegúrate de que algo dentro del bucle cambie la condición.",
+     "task": "Un ahorro de `50000` crece un **5% por mes** (multiplica por `1.05`). Con un `while`, calcula cuántos **meses** hacen falta para llegar a **100000 o más**. Guarda los meses en `resultado`.",
+     "starter": "ahorro = 50000\nmeses = 0\n# tu while aquí 👇\n\nresultado = meses",
+     "solution": "ahorro = 50000\nmeses = 0\nwhile ahorro < 100000:\n    ahorro *= 1.05\n    meses += 1\nresultado = meses",
+     "hint": "while ahorro < 100000:\n    ahorro *= 1.05\n    meses += 1",
+     "sql": "",
+     "check": {
+      "custom": "resultado == 15 and 'while' in _pq_code",
+      "custom_msg": "Con un 5% mensual hacen falta 15 meses. Usa while."
+     }
+    },
+    {
+     "id": "py20",
+     "sec": "Bucles",
+     "title": "enumerate y zip",
+     "level": 2,
+     "xp": 20,
+     "theory": "Dos funciones que hacen los bucles mucho más limpios:\n\n`enumerate` te da la **posición** y el **valor** a la vez:\n\n```python\nfor i, nombre in enumerate([\"Ana\", \"Luis\"], start=1):\n    print(i, nombre)     # 1 Ana / 2 Luis\n```\n\n`zip` recorre **varias listas en paralelo**, elemento por elemento:\n\n```python\nproductos = [\"mouse\", \"teclado\"]\nprecios = [25, 45]\nfor prod, precio in zip(productos, precios):\n    print(f\"{prod}: ${precio}\")\n\ndict(zip(productos, precios))   # {'mouse': 25, 'teclado': 45}\n```\n\n> 💡 Viste `enumerate(zip(...))` en la Clase 4: es combinar las dos ideas.",
+     "task": "Usa `zip` para calcular el **ingreso** de cada producto (`precio * cantidad`) y guarda en `resultado` un **diccionario** `{producto: ingreso}`.",
+     "starter": "productos = ['Laptop', 'Mouse', 'Monitor']\nprecios = [1200, 25, 300]\ncantidades = [3, 40, 5]\nresultado = {}",
+     "solution": "productos = ['Laptop', 'Mouse', 'Monitor']\nprecios = [1200, 25, 300]\ncantidades = [3, 40, 5]\nresultado = {}\nfor prod, precio, cant in zip(productos, precios, cantidades):\n    resultado[prod] = precio * cant",
+     "hint": "for prod, precio, cant in zip(productos, precios, cantidades):\n    resultado[prod] = precio * cant",
+     "sql": "",
+     "check": {
+      "custom": "resultado == {'Laptop': 3600, 'Mouse': 1000, 'Monitor': 1500}",
+      "custom_msg": "Debe quedar {'Laptop': 3600, 'Mouse': 1000, 'Monitor': 1500}."
+     }
+    },
+    {
+     "id": "py21",
+     "sec": "Bucles",
+     "title": "List comprehensions",
+     "level": 3,
+     "xp": 35,
+     "theory": "Una **list comprehension** crea una lista nueva en **una sola línea**. Es uno de los rasgos más característicos de Python, y lo vas a leer en cualquier código profesional:\n\n```python\n# forma larga\ncuadrados = []\nfor n in range(5):\n    cuadrados.append(n ** 2)\n\n# list comprehension: lo mismo en una línea\ncuadrados = [n ** 2 for n in range(5)]        # [0, 1, 4, 9, 16]\n\n# con filtro: solo los pares\npares = [n for n in range(10) if n % 2 == 0]  # [0, 2, 4, 6, 8]\n```\n\nSe lee así: \"**dame** `expresión` **para cada** `elemento` **en** `secuencia` **si** `condición`\".\n\nTambién existen para diccionarios: `{k: v for k, v in pares}`.",
+     "task": "Con una **list comprehension**, crea una lista con los precios **con 21% de IVA** (redondeados a 2 decimales con `round(x, 2)`) pero **solo** de los precios mayores a 50. Guárdala en `resultado`.",
+     "starter": "precios = [100, 25.5, 80, 45, 300]\nresultado = ",
+     "solution": "precios = [100, 25.5, 80, 45, 300]\nresultado = [round(p * 1.21, 2) for p in precios if p > 50]",
+     "hint": "[round(p * 1.21, 2) for p in precios if p > 50]",
+     "sql": "",
+     "check": {
+      "custom": "resultado == [121.0, 96.8, 363.0] and ' for ' in _pq_code and '[' in _pq_code",
+      "custom_msg": "Deben quedar [121.0, 96.8, 363.0], hecho con una list comprehension."
+     }
+    },
+    {
+     "id": "py22",
+     "sec": "Funciones",
+     "title": "Tu primera función",
+     "level": 1,
+     "xp": 10,
+     "theory": "Una **función** es un bloque de código con nombre que puedes reutilizar. Se define con `def`, recibe **parámetros** y devuelve un valor con `return`:\n\n```python\ndef area_rectangulo(base, altura):\n    return base * altura\n\narea_rectangulo(3, 4)    # 12\narea_rectangulo(10, 2)   # 20\n```\n\nBuenas prácticas:\n- Nombres con verbo o descriptivos: `calcular_total`, `limpiar_texto`.\n- Una función hace **una sola cosa**.\n- Un comentario entre triples comillas justo debajo del `def` (*docstring*) explica qué hace.\n\n> ⚠️ `print` muestra un valor, pero **no lo devuelve**. Si tu función usa `print` en vez de `return`, el resultado no se puede guardar ni reutilizar.",
+     "task": "Define la función `precio_final(precio, descuento)` que devuelva el precio aplicando el descuento (el descuento viene en porcentaje: `20` significa 20%). Después guarda en `resultado` el valor de `precio_final(15000, 20)`.",
+     "starter": "def precio_final(precio, descuento):\n    # tu código aquí 👇\n    pass\n\nresultado = precio_final(15000, 20)",
+     "solution": "def precio_final(precio, descuento):\n    return precio * (1 - descuento / 100)\n\nresultado = precio_final(15000, 20)",
+     "hint": "return precio * (1 - descuento / 100)",
+     "sql": "",
+     "check": {
+      "custom": "abs(resultado - 12000) < 1e-9 and abs(precio_final(1000, 50) - 500) < 1e-9 and abs(precio_final(200, 0) - 200) < 1e-9",
+      "custom_msg": "precio_final(15000, 20) debe devolver 12000. ¿Usaste return?"
+     }
+    },
+    {
+     "id": "py23",
+     "sec": "Funciones",
+     "title": "Parámetros por defecto",
+     "level": 2,
+     "xp": 20,
+     "theory": "Un parámetro puede tener un **valor por defecto**: si al llamar la función no lo pasas, usa ese valor.\n\n```python\ndef saludar(nombre, saludo=\"Hola\"):\n    return f\"{saludo}, {nombre}!\"\n\nsaludar(\"Ana\")                    # 'Hola, Ana!'\nsaludar(\"Ana\", \"Buenas\")          # 'Buenas, Ana!'\nsaludar(nombre=\"Ana\", saludo=\"Hey\")   # argumentos por nombre (keyword)\n```\n\nAsí funcionan casi todas las funciones de pandas: `df.sort_values(\"col\", ascending=False)` usa `ascending=False` para cambiar el valor por defecto (`True`).\n\n> 💡 Los parámetros con valor por defecto van **siempre al final**.",
+     "task": "Define `convertir(monto, cotizacion=1000)` que devuelva el monto en pesos dividido por la cotización, **redondeado a 2 decimales**. Guarda en `resultado` una lista con `convertir(250000)` y `convertir(250000, cotizacion=1250)`.",
+     "starter": "def convertir(monto, cotizacion):\n    pass\n\nresultado = [convertir(250000), convertir(250000, cotizacion=1250)]",
+     "solution": "def convertir(monto, cotizacion=1000):\n    return round(monto / cotizacion, 2)\n\nresultado = [convertir(250000), convertir(250000, cotizacion=1250)]",
+     "hint": "def convertir(monto, cotizacion=1000):\n    return round(monto / cotizacion, 2)",
+     "sql": "",
+     "check": {
+      "custom": "resultado == [250.0, 200.0] and convertir(1000) == 1.0",
+      "custom_msg": "Debe dar [250.0, 200.0]. ¿Pusiste cotizacion=1000 como valor por defecto?"
+     }
+    },
+    {
+     "id": "py24",
+     "sec": "Funciones",
+     "title": "lambda y ordenar con key",
+     "level": 3,
+     "xp": 35,
+     "theory": "Una **lambda** es una función pequeña y sin nombre, escrita en una línea. Se usa para pasarle una función a otra función:\n\n```python\ndoble = lambda x: x * 2        # igual que def doble(x): return x * 2\ndoble(5)                       # 10\n```\n\nSu uso más común es el parámetro `key` de `sorted`, `max` y `min`, que indica **por qué** ordenar:\n\n```python\nalumnos = [(\"Ana\", 8), (\"Luis\", 9), (\"Eva\", 7)]\nsorted(alumnos, key=lambda a: a[1])                 # por nota, de menor a mayor\nsorted(alumnos, key=lambda a: a[1], reverse=True)   # de mayor a menor\n```\n\n> 💼 **En el trabajo:** vas a ver lambdas en pandas todo el tiempo: `df[\"col\"].apply(lambda x: x.strip())` o `df.sort_values(key=...)`.",
+     "task": "Ordena la lista `productos` (tuplas de `(nombre, precio)`) por **precio de mayor a menor** usando `sorted` con una `lambda`. Guarda en `resultado` solo los **nombres** en ese orden.",
+     "starter": "productos = [('Mouse', 25), ('Laptop', 1200), ('Monitor', 300), ('Teclado', 45)]\nordenados = \nresultado = [p[0] for p in ordenados]",
+     "solution": "productos = [('Mouse', 25), ('Laptop', 1200), ('Monitor', 300), ('Teclado', 45)]\nordenados = sorted(productos, key=lambda p: p[1], reverse=True)\nresultado = [p[0] for p in ordenados]",
+     "hint": "sorted(productos, key=lambda p: p[1], reverse=True)",
+     "sql": "",
+     "check": {
+      "custom": "resultado == ['Laptop', 'Monitor', 'Teclado', 'Mouse'] and 'lambda' in _pq_code",
+      "custom_msg": "El orden debe ser Laptop, Monitor, Teclado, Mouse. Usa sorted con key=lambda."
+     }
+    },
+    {
+     "id": "py25",
+     "sec": "Código profesional",
+     "title": "Manejar errores con try",
+     "level": 2,
+     "xp": 20,
+     "theory": "Cuando algo puede fallar (un dato mal cargado, un archivo que no existe), `try / except` evita que el programa se detenga:\n\n```python\ndef a_numero(texto):\n    try:\n        return float(texto)\n    except ValueError:        # solo atrapa ese tipo de error\n        return None\n\na_numero(\"12.5\")    # 12.5\na_numero(\"n/d\")     # None, sin romper el programa\n```\n\nErrores que vas a ver seguido:\n\n| Error | Cuándo aparece |\n|---|---|\n| `ValueError` | un valor con formato inválido (`int(\"abc\")`) |\n| `KeyError` | una clave o columna que no existe |\n| `TypeError` | operar tipos incompatibles (`\"5\" + 3`) |\n| `ZeroDivisionError` | dividir por cero |\n\n> ⚠️ Evita `except:` a secas: atrapa **todos** los errores y esconde problemas reales. Indica siempre qué error esperas.",
+     "task": "Recorre `edades_texto`, convierte cada valor con `int()`, y **saltea** los que no se pueden convertir (atrapa el `ValueError`). Guarda en `resultado` la lista de edades válidas.",
+     "starter": "edades_texto = ['34', '28', 'n/d', '45', '', '19']\nresultado = []\nfor e in edades_texto:\n    resultado.append(int(e))   # ⚠️ se rompe con 'n/d'",
+     "solution": "edades_texto = ['34', '28', 'n/d', '45', '', '19']\nresultado = []\nfor e in edades_texto:\n    try:\n        resultado.append(int(e))\n    except ValueError:\n        pass",
+     "hint": "try:\n    resultado.append(int(e))\nexcept ValueError:\n    pass",
+     "sql": "",
+     "check": {
+      "custom": "resultado == [34, 28, 45, 19] and 'except' in _pq_code",
+      "custom_msg": "Deben quedar [34, 28, 45, 19]. Usa try / except ValueError."
+     }
+    },
+    {
+     "id": "py26",
+     "sec": "Código profesional",
+     "title": "Importar módulos",
+     "level": 1,
+     "xp": 10,
+     "theory": "Python trae una **biblioteca estándar** enorme, y además hay miles de librerías externas (pandas, NumPy…). Para usarlas se **importan**:\n\n```python\nimport math                       # importa el módulo completo\nmath.sqrt(16)                     # 4.0\n\nfrom statistics import median     # importa solo una función\nmedian([3, 1, 2])                 # 2\n\nimport pandas as pd               # importa con un alias (apodo)\n```\n\nMódulos estándar muy útiles: `math` (matemática), `statistics` (estadística básica), `random` (azar), `datetime` (fechas), `os` y `pathlib` (archivos), `json` (datos de APIs).\n\n> 💼 **En el trabajo:** los alias son convenciones universales. Siempre `import pandas as pd`, `import numpy as np`, `import matplotlib.pyplot as plt` y `import seaborn as sns`. Si usas otro nombre, tu código va a confundir a todos.",
+     "task": "Importa el módulo `statistics` y guarda en `resultado` una lista con la **media** (`mean`), la **mediana** (`median`) y la **moda** (`mode`) de `sueldos`.",
+     "starter": "sueldos = [30000, 35000, 40000, 45000, 45000, 55000, 500000]\n\nresultado = [ , , ]",
+     "solution": "import statistics\nsueldos = [30000, 35000, 40000, 45000, 45000, 55000, 500000]\nresultado = [statistics.mean(sueldos), statistics.median(sueldos), statistics.mode(sueldos)]",
+     "hint": "import statistics  ->  statistics.mean(sueldos), statistics.median(sueldos), statistics.mode(sueldos)",
+     "sql": "",
+     "check": {
+      "custom": "len(resultado) == 3 and abs(resultado[0] - 750000 / 7) < 1e-6 and resultado[1] == 45000 and resultado[2] == 45000",
+      "custom_msg": "Deben ser media (~107142.86), mediana (45000) y moda (45000)."
+     }
+    },
+    {
+     "id": "py27",
+     "sec": "Código profesional",
+     "title": "Clases y objetos",
+     "level": 3,
+     "xp": 35,
+     "theory": "Una **clase** es un molde para crear **objetos** que juntan datos (**atributos**) y comportamiento (**métodos**). Todo en Python es un objeto: un DataFrame es un objeto de la clase `DataFrame`, y `df.head()` es uno de sus métodos.\n\n```python\nclass Socio:\n    def __init__(self, nombre, cuota):   # se ejecuta al crear el objeto\n        self.nombre = nombre             # self = el propio objeto\n        self.cuota = cuota\n        self.pagos = []\n\n    def pagar(self, monto):              # un método\n        self.pagos.append(monto)\n\n    def al_dia(self):\n        return sum(self.pagos) >= self.cuota\n\nana = Socio(\"Ana\", 12000)   # crear un objeto (instancia)\nana.pagar(12000)\nana.al_dia()                # True\n```\n\n> 💼 **En el trabajo:** no hace falta que escribas muchas clases para analizar datos, pero **necesitas leerlas**: scikit-learn funciona así (`modelo = LinearRegression()` y después `modelo.fit(...)`).",
+     "task": "Completa la clase `Cuenta`: el método `depositar(monto)` suma el monto al `saldo`, y `retirar(monto)` lo resta **solo si hay saldo suficiente** (si no, no hace nada). Crea una cuenta con saldo `1000`, deposita `500`, intenta retirar `2000` y después retira `300`. Guarda el saldo final en `resultado`.",
+     "starter": "class Cuenta:\n    def __init__(self, saldo):\n        self.saldo = saldo\n\n    def depositar(self, monto):\n        pass\n\n    def retirar(self, monto):\n        pass\n\ncuenta = Cuenta(1000)\ncuenta.depositar(500)\ncuenta.retirar(2000)\ncuenta.retirar(300)\nresultado = cuenta.saldo",
+     "solution": "class Cuenta:\n    def __init__(self, saldo):\n        self.saldo = saldo\n\n    def depositar(self, monto):\n        self.saldo += monto\n\n    def retirar(self, monto):\n        if monto <= self.saldo:\n            self.saldo -= monto\n\ncuenta = Cuenta(1000)\ncuenta.depositar(500)\ncuenta.retirar(2000)\ncuenta.retirar(300)\nresultado = cuenta.saldo",
+     "hint": "def retirar(self, monto):\n    if monto <= self.saldo:\n        self.saldo -= monto",
+     "sql": "",
+     "check": {
+      "custom": "resultado == 1200 and Cuenta(50).saldo == 50",
+      "custom_msg": "El saldo final debe ser 1200: 1000 + 500, el retiro de 2000 no se hace, y se retiran 300."
+     }
+    }
+   ]
+  },
+  {
    "id": "m01",
    "title": "Pandas",
    "icon": "🐼",
-   "color": "#22d3a0",
+   "color": "#0098cc",
    "desc": "Qué es pandas, Series, operaciones vectorizadas y tu primer contacto con tablas reales.",
    "setup": "",
    "packages": [],
@@ -24,7 +497,7 @@ window.PQ = {
     {
      "id": "pd01",
      "sec": "Series: la pieza básica",
-     "title": "Hola, pandas 👋",
+     "title": "Hola, pandas",
      "level": 1,
      "xp": 10,
      "theory": "**pandas** es la librería de Python para trabajar con datos en forma de tabla. Es la herramienta número uno de analistas, científicos e ingenieros de datos: con ella se leen archivos, se limpian datos, se calculan métricas y se preparan datos para modelos de Machine Learning.\n\nTodo en pandas se construye con dos piezas:\n- **Series**: una columna de datos con etiquetas.\n- **DataFrame**: una tabla, que en el fondo es un conjunto de Series que comparten las mismas etiquetas.\n\nUna Series tiene **valores** y un **índice** (las etiquetas de cada valor). Si no indicas el índice, pandas usa 0, 1, 2…\n\n```python\nimport pandas as pd   # \"pd\" es el alias estándar que usa todo el mundo\n\ntemperaturas = pd.Series([22, 25, 19], index=[\"lun\", \"mar\", \"mié\"])\nprint(temperaturas)\n# lun    22\n# mar    25\n# mié    19\n# dtype: int64\n```\nEl `dtype` final indica el **tipo de dato** de los valores (int64 = números enteros).\n\n> 💼 **En el trabajo:** cada columna que leas de un Excel, un CSV o una base de datos llega a pandas como una Series.",
@@ -262,6 +735,76 @@ window.PQ = {
      }
     },
     {
+     "id": "st01",
+     "sec": "Estadística descriptiva",
+     "title": "Media vs mediana",
+     "level": 1,
+     "xp": 10,
+     "theory": "La **media** (promedio) suma todos los valores y los divide por la cantidad. La **mediana** es el valor del **medio** cuando los datos están ordenados.\n\nParecen lo mismo, pero no lo son. Mira este ejemplo clásico de sueldos:\n\n```python\nsueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nsueldos.mean()      # 107857.14  -> inflada por un solo sueldo de 500.000\nsueldos.median()    # 45000.0    -> la mitad gana menos y la otra mitad más\n```\n\nUn solo valor extremo (el sueldo de un CEO, por ejemplo) arrastra la media hacia arriba, pero casi no mueve la mediana.\n\n> 💼 **En el trabajo:** con sueldos, precios de viviendas o montos de compras (datos con valores extremos) se informa la **mediana**. La media se usa cuando los datos son parejos y sin extremos.",
+     "task": "Guarda en `resultado` una lista con la **media** y la **mediana** de `sueldos`.",
+     "starter": "sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nresultado = [ , ]",
+     "solution": "sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nresultado = [sueldos.mean(), sueldos.median()]",
+     "hint": "[sueldos.mean(), sueldos.median()]",
+     "sql": "SELECT AVG(sueldo) FROM empleados;  -- la mediana no es estándar en SQL\n-- PostgreSQL: SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY sueldo) FROM empleados;",
+     "check": {}
+    },
+    {
+     "id": "st02",
+     "sec": "Estadística descriptiva",
+     "title": "La moda",
+     "level": 1,
+     "xp": 10,
+     "theory": "La **moda** es el valor que **más se repite**. Es la única medida de tendencia central que también sirve para datos de **texto** (categorías).\n\n```python\ntalles = pd.Series([\"M\", \"L\", \"M\", \"S\", \"M\", \"L\"])\ntalles.mode()        # 0    M   -> devuelve una Series\ntalles.mode()[0]     # 'M'\n```\n\n`mode()` devuelve una **Series** y no un solo valor porque puede haber **empate**: si dos valores aparecen la misma cantidad de veces, los datos son **bimodales** y pandas devuelve los dos.\n\n```python\npd.Series([10, 12, 12, 15, 15]).mode()   # 12 y 15\n```\n\n> 💼 **En el trabajo:** el talle más vendido, el producto más comprado o la respuesta más común de una encuesta son modas.",
+     "task": "Los `montos` son las cuotas que pagaron los socios de un gimnasio. Guarda en `resultado` la **lista** de modas (usa `.mode()` y conviértelo con `.tolist()`).",
+     "starter": "montos = pd.Series([10000, 12000, 15000, 15000, 12000, 9500, 12000, 15000])\nresultado = ",
+     "solution": "montos = pd.Series([10000, 12000, 15000, 15000, 12000, 9500, 12000, 15000])\nresultado = montos.mode().tolist()",
+     "hint": "montos.mode().tolist()",
+     "sql": "SELECT monto, COUNT(*) AS veces FROM pagos\nGROUP BY monto ORDER BY veces DESC;",
+     "check": {}
+    },
+    {
+     "id": "st03",
+     "sec": "Estadística descriptiva",
+     "title": "Cuartiles",
+     "level": 2,
+     "xp": 20,
+     "theory": "Los **cuartiles** dividen los datos ordenados en **cuatro partes iguales** (25% cada una):\n\n| Cuartil | Significado | pandas |\n|---|---|---|\n| **Q1** | el 25% de los datos está por debajo | `s.quantile(0.25)` |\n| **Q2** | el 50% está por debajo (**es la mediana**) | `s.quantile(0.50)` |\n| **Q3** | el 75% está por debajo | `s.quantile(0.75)` |\n\n```python\ns = pd.Series([10, 12, 12, 15, 18, 20, 22])\ns.quantile([0.25, 0.5, 0.75])    # 12.0, 15.0, 19.0\n```\n\nCon los sueldos del ejemplo, el 50% del medio de la gente gana entre Q1 y Q3: ese es el **rango típico**.\n\n> 💡 pandas calcula los cuartiles **interpolando** entre valores. Por eso a veces da un número que no está en los datos, o difiere un poco de lo que harías a mano. La conclusión es la misma.",
+     "task": "Guarda en `resultado` una lista con **Q1, Q2 y Q3** de `sueldos`.",
+     "starter": "sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nresultado = ",
+     "solution": "sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nresultado = [sueldos.quantile(0.25), sueldos.quantile(0.5), sueldos.quantile(0.75)]",
+     "hint": "[sueldos.quantile(0.25), sueldos.quantile(0.5), sueldos.quantile(0.75)]",
+     "sql": "",
+     "check": {}
+    },
+    {
+     "id": "st04",
+     "sec": "Estadística descriptiva",
+     "title": "Detectar outliers con IQR",
+     "level": 3,
+     "xp": 35,
+     "theory": "Un **outlier** (valor atípico) es un dato muy alejado del resto. Puede ser un error de carga o un caso especial real, y siempre hay que revisarlo.\n\nEl **criterio de cuartiles** (el mismo que usan los diagramas de caja) dice:\n\n1. **IQR** = Q3 − Q1 → el ancho del 50% central\n2. **Límite inferior** = Q1 − 1.5 × IQR\n3. **Límite superior** = Q3 + 1.5 × IQR\n4. Todo lo que quede **afuera** de los límites es outlier.\n\n```python\nq1, q3 = s.quantile(0.25), s.quantile(0.75)\niqr = q3 - q1\noutliers = s[(s < q1 - 1.5 * iqr) | (s > q3 + 1.5 * iqr)]\n```\n\nCon los sueldos de clase: Q1 = 37.500, Q3 = 52.500, IQR = 15.000 → rango normal de 15.000 a 75.000. El sueldo de **500.000** queda afuera: es el outlier.\n\n> ⚠️ Detectar un outlier no significa borrarlo. Primero entiende **por qué** está ahí.",
+     "task": "Calcula los límites con el criterio IQR y guarda en `resultado` la **Series** con los outliers de `sueldos`.",
+     "starter": "sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nq1 = sueldos.quantile(0.25)\nq3 = sueldos.quantile(0.75)\niqr = \nresultado = ",
+     "solution": "sueldos = pd.Series([30000, 35000, 40000, 45000, 50000, 55000, 500000])\nq1 = sueldos.quantile(0.25)\nq3 = sueldos.quantile(0.75)\niqr = q3 - q1\nresultado = sueldos[(sueldos < q1 - 1.5 * iqr) | (sueldos > q3 + 1.5 * iqr)]",
+     "hint": "sueldos[(sueldos < q1 - 1.5 * iqr) | (sueldos > q3 + 1.5 * iqr)]",
+     "sql": "",
+     "check": {}
+    },
+    {
+     "id": "st05",
+     "sec": "Estadística descriptiva",
+     "title": "Desviación estándar",
+     "level": 2,
+     "xp": 20,
+     "theory": "La **desviación estándar** mide cuánto se alejan **típicamente** los datos de la media:\n\n- **Baja**: los datos están agrupados cerca de la media (son predecibles).\n- **Alta**: los datos están dispersos.\n\n```python\npd.Series([5, 5, 5, 5]).std()       # 0.0   -> todos iguales\npd.Series([2, 8]).std()             # 4.24  -> muy dispersos\n```\n\nPara comparar la dispersión de datos con escalas distintas (sueldos en pesos contra edades en años) se usa el **coeficiente de variación**: `std / mean`. Sin unidades, se puede comparar.\n\n> 💡 pandas calcula la desviación **muestral** (divide por n − 1). NumPy (`np.std`) usa por defecto la **poblacional** (divide por n). Por eso a veces dan distinto.",
+     "task": "Guarda en `resultado` el **coeficiente de variación** (`std / mean`) de las `edades` de un grupo, **redondeado a 3 decimales** con `round(valor, 3)`.",
+     "starter": "edades = pd.Series([10, 12, 12, 15, 18, 20, 22])\nresultado = ",
+     "solution": "edades = pd.Series([10, 12, 12, 15, 18, 20, 22])\nresultado = round(edades.std() / edades.mean(), 3)",
+     "hint": "round(edades.std() / edades.mean(), 3)",
+     "sql": "SELECT STDDEV(edad) / AVG(edad) FROM grupo;",
+     "check": {}
+    },
+    {
      "id": "pd18",
      "sec": "Leer y guardar datos",
      "title": "Leer un CSV",
@@ -295,7 +838,7 @@ window.PQ = {
    "id": "m02",
    "title": "DataFrames",
    "icon": "📋",
-   "color": "#38bdf8",
+   "color": "#d8231b",
    "desc": "Seleccionar, filtrar, limpiar, agrupar, unir y reestructurar tablas. Y conectarlas con bases de datos SQL.",
    "setup": "\nimport sqlite3\nconn = sqlite3.connect(\":memory:\")\nclientes.to_sql(\"clientes\", conn, index=False)\nproductos.to_sql(\"productos\", conn, index=False)\npedidos.to_sql(\"pedidos\", conn, index=False)\n\ntrimestral = pd.DataFrame({\n    \"tienda\": [\"Centro\", \"Norte\", \"Sur\"],\n    \"Q1\": [100, 80, 60],\n    \"Q2\": [120, 95, 70],\n    \"Q3\": [130, 90, 85],\n})\n",
    "packages": [
@@ -785,6 +1328,20 @@ window.PQ = {
       "ordered": false,
       "ignore_index": true
      }
+    },
+    {
+     "id": "df34",
+     "sec": "DataFrames y bases de datos",
+     "title": "Cargar un script .sql",
+     "level": 3,
+     "xp": 35,
+     "theory": "Cuando trabajas en **MySQL Workbench** no obtienes un archivo de base de datos: obtienes un **script `.sql`**, un texto con instrucciones `CREATE TABLE` e `INSERT`. Para analizarlo con pandas hay que **ejecutar** ese script en una base, y después consultarla.\n\nLa librería `sqlite3` (viene con Python) crea una base con `connect` y ejecuta un script completo con `executescript`:\n\n```python\nimport sqlite3\n\nwith open(\"parcial.sql\", encoding=\"utf-8\") as f:\n    script = f.read()\n\nbase = sqlite3.connect(\":memory:\")   # base en memoria (o \"gimnasio.db\" para un archivo)\nbase.executescript(script)           # ejecuta TODAS las instrucciones\ndf = pd.read_sql(\"SELECT * FROM socios\", base)\n```\n\nSQLite no entiende algunas instrucciones que son exclusivas de MySQL. Hay que quitarlas o adaptarlas:\n\n| MySQL | SQLite |\n|---|---|\n| `CREATE DATABASE x;` y `USE x;` | no existen: el archivo **es** la base |\n| `id INT AUTO_INCREMENT PRIMARY KEY` | `id INTEGER PRIMARY KEY AUTOINCREMENT` |\n| `ENGINE=InnoDB` | no existe |\n\nEl apunte de clase se conecta con SQLAlchemy, y el resultado es el mismo: `create_engine(\"sqlite:///gimnasio.db\")` y después `pd.read_sql(consulta, engine)`.\n\n> 💼 **En el trabajo:** hacer las consultas pesadas en SQL y traer a pandas solo el resultado es la combinación más usada por analistas de datos.",
+     "task": "Crea una base en memoria, ejecuta el `script` con `executescript` y guarda en `resultado` (con `read_sql`) la **recaudación total por socio**: columnas `nombre` y `total`, ordenadas de mayor a menor total.",
+     "starter": "import sqlite3\nscript = '''\nCREATE TABLE socios (id_socio INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT);\nCREATE TABLE pagos (id_pago INTEGER PRIMARY KEY AUTOINCREMENT, monto REAL, id_socio INTEGER);\nINSERT INTO socios (nombre) VALUES ('Alejandro'), ('María'), ('Carlos');\nINSERT INTO pagos (monto, id_socio) VALUES (10000, 1), (12000, 1), (15000, 2), (15000, 3), (12000, 3);\n'''\nbase = \n\nresultado = ",
+     "solution": "import sqlite3\nscript = '''\nCREATE TABLE socios (id_socio INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT);\nCREATE TABLE pagos (id_pago INTEGER PRIMARY KEY AUTOINCREMENT, monto REAL, id_socio INTEGER);\nINSERT INTO socios (nombre) VALUES ('Alejandro'), ('María'), ('Carlos');\nINSERT INTO pagos (monto, id_socio) VALUES (10000, 1), (12000, 1), (15000, 2), (15000, 3), (12000, 3);\n'''\nbase = sqlite3.connect(':memory:')\nbase.executescript(script)\nresultado = pd.read_sql('''\n    SELECT s.nombre, SUM(p.monto) AS total\n    FROM socios s JOIN pagos p ON s.id_socio = p.id_socio\n    GROUP BY s.nombre\n    ORDER BY total DESC\n''', base)",
+     "hint": "base = sqlite3.connect(':memory:')  ->  base.executescript(script)  ->  SELECT s.nombre, SUM(p.monto) AS total ... GROUP BY ... ORDER BY total DESC",
+     "sql": "SELECT s.nombre, SUM(p.monto) AS total\nFROM socios s JOIN pagos p ON s.id_socio = p.id_socio\nGROUP BY s.nombre\nORDER BY total DESC;",
+     "check": {}
     }
    ]
   },
@@ -792,7 +1349,7 @@ window.PQ = {
    "id": "m03",
    "title": "NumPy",
    "icon": "🔢",
-   "color": "#a78bfa",
+   "color": "#1d5bb0",
    "desc": "Arrays, indexado, cálculo vectorizado y broadcasting: el motor numérico debajo de pandas.",
    "setup": "\ntemperaturas = np.array([21.5, 23.0, 19.8, 25.1, 27.3, 22.4, 18.9])   # una semana, en °C\nnotas = np.array([[7, 8, 6],\n                  [9, 5, 8],\n                  [6, 7, 9],\n                  [8, 9, 10],\n                  [5, 6, 7]])                                          # 5 alumnos x 3 exámenes\nprecios = productos[\"precio\"].to_numpy()\n",
    "packages": [],
@@ -1020,7 +1577,7 @@ window.PQ = {
    "id": "m04",
    "title": "Matplotlib",
    "icon": "📈",
-   "color": "#fb923c",
+   "color": "#00825a",
    "desc": "Líneas, barras, histogramas, dispersión y subplots. Convierte datos en gráficos claros.",
    "setup": "\nimport matplotlib.pyplot as plt\n\nmeses = [\"Ene\", \"Feb\", \"Mar\", \"Abr\", \"May\", \"Jun\"]\ningresos = [12.5, 14.1, 13.8, 16.2, 18.9, 21.3]   # miles\ngastos = [10.2, 11.0, 11.5, 12.1, 13.0, 13.4]     # miles\n",
    "packages": [
@@ -1106,6 +1663,60 @@ window.PQ = {
       "plot": true,
       "custom": "len(_ax().lines) == 1 and _hex(_ax().lines[0].get_color()) == '#008000' and _ax().lines[0].get_marker() == 'o' and _ax().lines[0].get_linestyle() == '--'",
       "custom_msg": "La línea debe ser verde ('green'), con marcador 'o' y estilo '--'."
+     }
+    },
+    {
+     "id": "plt12",
+     "sec": "Primeros gráficos",
+     "title": "Formato abreviado y cuadrícula",
+     "level": 2,
+     "xp": 20,
+     "theory": "En lugar de escribir `color=`, `marker=` y `linestyle=` por separado, `plot` acepta un **formato abreviado** como tercer argumento: un texto corto que combina **color + marcador + línea**.\n\n| Código | Significado |\n|---|---|\n| `'r--'` | rojo, línea discontinua |\n| `'bo'` | azul, solo círculos (sin línea) |\n| `'g^-'` | verde, triángulos y línea sólida |\n| `'ks:'` | negro (*k*), cuadrados y línea punteada |\n\nColores: `r` rojo, `g` verde, `b` azul, `k` negro, `m` magenta, `c` cian, `y` amarillo.\n\nLa **cuadrícula** ayuda a leer los valores. `alpha` la hace más suave:\n\n```python\nplt.plot(x, y, 'bo-')\nplt.grid(True, alpha=0.3)\n```",
+     "task": "Dibuja `y` en función de `x` con **línea verde continua y marcadores cuadrados** usando el formato abreviado, y activa la **cuadrícula**.",
+     "starter": "x = [0, 1, 2, 3, 4]\ny = [1, 4, 6, 8, 10]\nplt.plot(x, y)",
+     "solution": "x = [0, 1, 2, 3, 4]\ny = [1, 4, 6, 8, 10]\nplt.plot(x, y, 'gs-')\nplt.grid(True)",
+     "hint": "plt.plot(x, y, 'gs-')  y  plt.grid(True)",
+     "sql": "",
+     "check": {
+      "plot": true,
+      "custom": "len(_ax().lines) == 1 and _hex(_ax().lines[0].get_color()) == '#008000' and _ax().lines[0].get_marker() == 's' and _ax().lines[0].get_linestyle() == '-' and _ax().xaxis.get_gridlines()[0].get_visible()",
+      "custom_msg": "La línea debe ser verde ('g'), con cuadrados ('s') y sólida ('-'). Y no olvides plt.grid(True)."
+     }
+    },
+    {
+     "id": "plt13",
+     "sec": "Primeros gráficos",
+     "title": "Límites de los ejes",
+     "level": 2,
+     "xp": 20,
+     "theory": "Matplotlib elige los límites de los ejes automáticamente, pero a veces conviene fijarlos: para comparar varios gráficos con la misma escala, o para enfocar una zona.\n\n```python\nplt.xlim(0, 10)              # eje X de 0 a 10\nplt.ylim(-5, 100)            # eje Y de -5 a 100\nplt.axis([0, 10, -5, 100])   # lo mismo en una línea: [xmin, xmax, ymin, ymax]\n```\n\n> ⚠️ Cuidado con cortar el eje Y para exagerar diferencias: un gráfico de barras que no empieza en 0 puede engañar a quien lo lee.",
+     "task": "Dibuja `y` en función de `x` y fija el **eje X de -1 a 6** y el **eje Y de -2 a 15**.",
+     "starter": "x = [0, 1, 2, 3, 4]\ny = [1, 4, 6, 8, 10]\nplt.plot(x, y, 'gs-')",
+     "solution": "x = [0, 1, 2, 3, 4]\ny = [1, 4, 6, 8, 10]\nplt.plot(x, y, 'gs-')\nplt.xlim(-1, 6)\nplt.ylim(-2, 15)",
+     "hint": "plt.xlim(-1, 6)  y  plt.ylim(-2, 15)",
+     "sql": "",
+     "check": {
+      "plot": true,
+      "custom": "len(_ax().lines) == 1 and tuple(round(v, 6) for v in _ax().get_xlim()) == (-1, 6) and tuple(round(v, 6) for v in _ax().get_ylim()) == (-2, 15)",
+      "custom_msg": "El eje X debe ir de -1 a 6 y el eje Y de -2 a 15."
+     }
+    },
+    {
+     "id": "plt14",
+     "sec": "Primeros gráficos",
+     "title": "Guardar tu gráfico",
+     "level": 1,
+     "xp": 10,
+     "theory": "`plt.savefig()` guarda el gráfico en un archivo para usarlo en un informe, una presentación o una web:\n\n```python\nplt.plot(numeros)\nplt.savefig(\"mi_grafico.png\", dpi=300, bbox_inches=\"tight\")\n```\n\n- La **extensión** define el formato: `.png` (imagen), `.pdf` o `.svg` (vectorial: no pierde calidad al agrandarse).\n- `dpi=300` → alta resolución, ideal para imprimir.\n- `bbox_inches=\"tight\"` → recorta los márgenes blancos sobrantes.\n\n> ⚠️ Llama a `savefig` **antes** de `plt.show()`: después de mostrarse, la figura se vacía y guardarías una imagen en blanco.",
+     "task": "Dibuja la línea de `numeros` y guárdala como **`mi_grafico.png`** con `dpi=150`.",
+     "starter": "numeros = [4, 2, 7, 6, 3]\nplt.plot(numeros)",
+     "solution": "numeros = [4, 2, 7, 6, 3]\nplt.plot(numeros)\nplt.savefig('mi_grafico.png', dpi=150)",
+     "hint": "plt.savefig('mi_grafico.png', dpi=150)",
+     "sql": "",
+     "check": {
+      "plot": true,
+      "custom": "len(_ax().lines) == 1 and 'savefig' in _pq_code and 'mi_grafico.png' in _pq_code and __import__('os').path.exists('mi_grafico.png')",
+      "custom_msg": "Usa plt.savefig('mi_grafico.png', dpi=150) después de dibujar."
      }
     },
     {
@@ -1199,6 +1810,60 @@ window.PQ = {
      }
     },
     {
+     "id": "plt15",
+     "sec": "Tipos de gráfico",
+     "title": "Histogramas superpuestos",
+     "level": 3,
+     "xp": 35,
+     "theory": "Para **comparar distribuciones** se pueden dibujar varios histogramas en el mismo gráfico. El truco es que no se tapen entre sí:\n\n- `histtype=\"step\"` dibuja solo el **contorno** de cada histograma.\n- `alpha` (de 0 a 1) da **transparencia**.\n- `bins` define cuántos intervalos usar. Con más bins ves más detalle, pero también más ruido.\n\n```python\nplt.hist(grupo_a, bins=30, histtype=\"step\", alpha=0.7, label=\"A\")\nplt.hist(grupo_b, bins=30, histtype=\"step\", alpha=0.7, label=\"B\")\nplt.legend()\n```\n\nOtros parámetros útiles de `plt.hist`: `density=True` (el eje Y muestra densidad en vez de conteo) y `color` / `edgecolor` (relleno y contorno).",
+     "task": "Dibuja los **tres** histogramas (`serie1`, `serie2`, `serie3`) en el mismo gráfico, cada uno con `bins=35`, `histtype='step'` y `alpha=0.6`.",
+     "starter": "rng = np.random.default_rng(42)\nserie1 = rng.normal(0, 1, 800)\nserie2 = rng.normal(2, 1, 600)\nserie3 = rng.normal(-2, 1, 200)\n",
+     "solution": "rng = np.random.default_rng(42)\nserie1 = rng.normal(0, 1, 800)\nserie2 = rng.normal(2, 1, 600)\nserie3 = rng.normal(-2, 1, 200)\nfor s in [serie1, serie2, serie3]:\n    plt.hist(s, bins=35, histtype='step', alpha=0.6)",
+     "hint": "plt.hist(serie1, bins=35, histtype='step', alpha=0.6)  (y lo mismo con serie2 y serie3)",
+     "sql": "",
+     "check": {
+      "plot": true,
+      "custom": "len(_ax().patches) == 3 and all(abs((p.get_alpha() or 0) - 0.6) < 1e-9 for p in _ax().patches) and not any(p.get_fill() for p in _ax().patches)",
+      "custom_msg": "Deben verse 3 histogramas tipo 'step' (sin relleno) con alpha=0.6."
+     }
+    },
+    {
+     "id": "plt16",
+     "sec": "Tipos de gráfico",
+     "title": "Scatter con dos grupos",
+     "level": 2,
+     "xp": 20,
+     "theory": "`plt.scatter` permite personalizar cada grupo de puntos:\n\n| Parámetro | Qué controla | Ejemplo |\n|---|---|---|\n| `color` o `c` | color de los puntos | `\"orange\"` |\n| `s` | tamaño | `80` |\n| `marker` | forma | `\"s\"` cuadrado, `\"D\"` diamante, `\"^\"` triángulo |\n| `label` | nombre en la leyenda | `\"Grupo A\"` |\n\n```python\nplt.scatter(x1, y1, color=\"orange\", marker=\"s\", label=\"Grupo A\")\nplt.scatter(x2, y2, color=\"purple\", marker=\"D\", label=\"Grupo B\")\nplt.legend()\n```\n\n> 💡 `plt.plot(x, y, 'o')` también dibuja puntos y es más rápido, pero **todos iguales**. `scatter` permite un color y un tamaño distinto **para cada punto** (útil para mostrar 4 variables a la vez).",
+     "task": "Dibuja dos grupos de puntos: el **Conjunto A** (`x1`, `y1`) en color `'orange'` con marcador `'s'`, y el **Conjunto B** (`x2`, `y2`) en color `'purple'` con marcador `'D'`. Agrega la leyenda.",
+     "starter": "x1 = [0, 1, 2, 3, 4]\ny1 = [1, 4, 6, 8, 10]\nx2 = [0, 1, 2, 3, 4]\ny2 = [0, 1, 8, 27, 64]\n",
+     "solution": "x1 = [0, 1, 2, 3, 4]\ny1 = [1, 4, 6, 8, 10]\nx2 = [0, 1, 2, 3, 4]\ny2 = [0, 1, 8, 27, 64]\nplt.scatter(x1, y1, color='orange', marker='s', label='Conjunto A')\nplt.scatter(x2, y2, color='purple', marker='D', label='Conjunto B')\nplt.legend()",
+     "hint": "plt.scatter(x1, y1, color='orange', marker='s', label='Conjunto A')  ...  plt.legend()",
+     "sql": "",
+     "check": {
+      "plot": true,
+      "custom": "len(_ax().collections) == 2 and sorted(_legend()) == ['Conjunto A', 'Conjunto B'] and _hex(_ax().collections[0].get_facecolor()[0]) == '#ffa500' and _hex(_ax().collections[1].get_facecolor()[0]) == '#800080'",
+      "custom_msg": "Deben verse 2 grupos (naranja y púrpura) y una leyenda con 'Conjunto A' y 'Conjunto B'."
+     }
+    },
+    {
+     "id": "plt17",
+     "sec": "Tipos de gráfico",
+     "title": "Torta profesional",
+     "level": 3,
+     "xp": 35,
+     "theory": "`plt.pie` tiene varios parámetros para que la torta se lea mejor:\n\n| Parámetro | Qué hace |\n|---|---|\n| `labels` | nombre de cada porción |\n| `autopct` | formato del porcentaje: `'%1.1f%%'` (1 decimal), `'%1.2f%%'` (2 decimales) |\n| `colors` | lista con un color por porción |\n| `explode` | separa porciones del centro: `(0, 0, 0.1, 0)` separa la tercera |\n| `shadow` | `True` agrega sombra |\n| `startangle` | ángulo donde empieza la primera porción (90 = arriba) |\n\n```python\nplt.pie(valores, labels=nombres, autopct=\"%1.1f%%\", explode=(0, 0.1, 0), startangle=90)\nplt.axis(\"equal\")   # que sea un círculo perfecto\n```\n\n> ⚠️ Úsala con **pocas categorías** (6 como máximo) y diferencias claras. Si no, un gráfico de barras se lee mejor.",
+     "task": "Con `df`, dibuja una torta con las etiquetas de cada producto, porcentajes con **2 decimales** (`'%1.2f%%'`), los `colores` dados, **sombra**, la porción de **Teléfonos separada** (`explode`) y el título **'Inventario de productos tecnológicos'**.",
+     "starter": "df = pd.DataFrame({\n    'productos': ['Laptops', 'Tablets', 'Teléfonos', 'Accesorios'],\n    'cantidades': [35, 30, 25, 10]\n})\ncolores = ['blue', 'green', 'gold', 'lightcoral']\nplt.pie(df['cantidades'])",
+     "solution": "df = pd.DataFrame({\n    'productos': ['Laptops', 'Tablets', 'Teléfonos', 'Accesorios'],\n    'cantidades': [35, 30, 25, 10]\n})\ncolores = ['blue', 'green', 'gold', 'lightcoral']\nplt.pie(df['cantidades'], labels=df['productos'], autopct='%1.2f%%', colors=colores,\n        shadow=True, explode=(0, 0, 0.1, 0))\nplt.title('Inventario de productos tecnológicos')",
+     "hint": "plt.pie(df['cantidades'], labels=df['productos'], autopct='%1.2f%%', colors=colores, shadow=True, explode=(0, 0, 0.1, 0))",
+     "sql": "",
+     "check": {
+      "plot": true,
+      "custom": "len([p for p in _ax().patches if type(p).__name__ == 'Wedge']) == 4 and '35.00%' in [t.get_text() for t in _ax().texts] and 'Teléfonos' in [t.get_text() for t in _ax().texts] and [_hex(p.get_facecolor()) for p in _ax().patches if type(p).__name__ == 'Wedge'] == ['#0000ff', '#008000', '#ffd700', '#f08080'] and tuple(round(v, 6) for v in [p for p in _ax().patches if type(p).__name__ == 'Wedge'][2].center) != (0, 0) and len(_ax().patches) > 4 and _ax().get_title() == 'Inventario de productos tecnológicos'",
+      "custom_msg": "Revisa: labels, autopct='%1.2f%%', colors=colores, shadow=True, explode=(0, 0, 0.1, 0) y el título exacto."
+     }
+    },
+    {
      "id": "plt10",
      "sec": "Composición y pandas",
      "title": "Varios gráficos juntos",
@@ -1233,6 +1898,60 @@ window.PQ = {
       "custom": "len(_ax().lines) >= 1 and len(_ax().lines[0].get_ydata()) == 90 and _ax().get_title() == 'Ventas diarias'",
       "custom_msg": "Debe verse una línea con los 90 días y el título 'Ventas diarias'."
      }
+    },
+    {
+     "id": "plt18",
+     "sec": "Composición y pandas",
+     "title": "Uno encima del otro",
+     "level": 2,
+     "xp": 20,
+     "theory": "`plt.subplots(filas, columnas)` crea una **figura** (el lienzo completo) con varios **ejes** (cada gráfico). La analogía: la figura es una pared y cada eje es un cuadro colgado en ella.\n\n```python\nfig, (arriba, abajo) = plt.subplots(2, 1, figsize=(6, 6))   # 2 filas, 1 columna\narriba.plot(x, y)\nabajo.scatter(x, y)\nplt.tight_layout()   # ajusta los márgenes para que nada se superponga\n```\n\nCon una cuadrícula de varias filas **y** columnas, los ejes vienen en un array y se accede con `[fila, columna]`:\n\n```python\nfig, axes = plt.subplots(2, 2)\naxes[0, 0].plot(...)   # arriba a la izquierda\naxes[1, 1].bar(...)    # abajo a la derecha\n```\n\n> 💡 `sharex=True` hace que los gráficos compartan el eje X: ideal para comparar series en el mismo período.",
+     "task": "Crea una figura con **2 gráficos, uno encima del otro**: arriba una **línea** y abajo un **scatter**, los dos con los datos `x` e `y`.",
+     "starter": "x = [0, 1, 2, 3]\ny = [1, 3, 9, 27]\nfig, (arriba, abajo) = plt.subplots(2, 1)\n",
+     "solution": "x = [0, 1, 2, 3]\ny = [1, 3, 9, 27]\nfig, (arriba, abajo) = plt.subplots(2, 1)\narriba.plot(x, y)\nabajo.scatter(x, y)\nplt.tight_layout()",
+     "hint": "arriba.plot(x, y)  y  abajo.scatter(x, y)",
+     "sql": "",
+     "check": {
+      "plot": true,
+      "custom": "len(_fig().axes) == 2 and _ax(0).get_position().y0 > _ax(1).get_position().y0 and len(_ax(0).lines) == 1 and len(_ax(1).collections) == 1",
+      "custom_msg": "Arriba debe haber una línea y abajo un scatter (usa plt.subplots(2, 1))."
+     }
+    },
+    {
+     "id": "plt19",
+     "sec": "Composición y pandas",
+     "title": "Cuadrícula de 3 × 2",
+     "level": 2,
+     "xp": 20,
+     "theory": "Cuando necesitas muchos gráficos (un **dashboard**), `plt.subplots` arma la cuadrícula completa de una vez. El segundo valor que devuelve es un **array de NumPy** con todos los ejes:\n\n```python\nfigura, ejes = plt.subplots(3, 2, figsize=(10, 9))\nejes.shape          # (3, 2)\nejes[2, 1]          # el gráfico de la tercera fila, segunda columna\n```\n\n`figsize=(ancho, alto)` se mide en pulgadas. Y `figura.suptitle(\"...\")` pone un título general arriba de todo.\n\n> 💼 **En el trabajo:** un panel de 3 × 2 con las métricas clave (ventas, clientes, stock…) es un formato clásico de reporte mensual.",
+     "task": "Crea una cuadrícula de **3 filas por 2 columnas** guardando la figura en `figura` y los ejes en `ejes`. Dibuja una línea con `datos` en el gráfico de **abajo a la derecha**.",
+     "starter": "datos = [3, 7, 4, 9]\n",
+     "solution": "datos = [3, 7, 4, 9]\nfigura, ejes = plt.subplots(3, 2)\nejes[2, 1].plot(datos)",
+     "hint": "figura, ejes = plt.subplots(3, 2)  y  ejes[2, 1].plot(datos)",
+     "sql": "",
+     "check": {
+      "plot": true,
+      "custom": "ejes.shape == (3, 2) and len(_fig().axes) == 6 and len(ejes[2, 1].lines) == 1 and sum(len(a.lines) for a in ejes.flat) == 1",
+      "custom_msg": "Crea `figura, ejes = plt.subplots(3, 2)` y dibuja solo en ejes[2, 1]."
+     }
+    },
+    {
+     "id": "plt20",
+     "sec": "Composición y pandas",
+     "title": "Fondo, área y valores",
+     "level": 3,
+     "xp": 35,
+     "theory": "Tres detalles que hacen que un gráfico se vea profesional:\n\n**1. Color de fondo de la figura**, con `facecolor`:\n\n```python\nplt.figure(figsize=(8, 4), facecolor=\"lightblue\")\n```\n\n**2. Área bajo la curva**, con `fill_between`. Rellena entre la línea y el eje, y resalta la tendencia:\n\n```python\nplt.plot(meses, ventas, lw=2)\nplt.fill_between(meses, ventas, alpha=0.15)\n```\n\n**3. Valores sobre las barras**, con `bar_label` (Matplotlib 3.4 o superior):\n\n```python\nbarras = plt.bar(cats, vals)\nplt.bar_label(barras)\n```",
+     "task": "Crea una figura con fondo **`'lightblue'`**, dibuja la línea de `ventas` por mes y rellena el **área bajo la curva** con `fill_between` y `alpha=0.2`.",
+     "starter": "meses = list(range(1, 13))\nventas = [120, 135, 115, 160, 175, 210, 198, 225, 190, 240, 265, 310]\nplt.plot(meses, ventas)",
+     "solution": "meses = list(range(1, 13))\nventas = [120, 135, 115, 160, 175, 210, 198, 225, 190, 240, 265, 310]\nplt.figure(facecolor='lightblue')\nplt.plot(meses, ventas)\nplt.fill_between(meses, ventas, alpha=0.2)",
+     "hint": "plt.figure(facecolor='lightblue')  ->  plt.plot(...)  ->  plt.fill_between(meses, ventas, alpha=0.2)",
+     "sql": "",
+     "check": {
+      "plot": true,
+      "custom": "_hex(_fig().get_facecolor()) == '#add8e6' and len(_ax().lines) == 1 and any('Poly' in type(c).__name__ and abs((c.get_alpha() or 0) - 0.2) < 1e-9 for c in _ax().collections)",
+      "custom_msg": "La figura debe tener fondo 'lightblue', una línea y el área rellena con fill_between(alpha=0.2)."
+     }
     }
    ]
   },
@@ -1240,7 +1959,7 @@ window.PQ = {
    "id": "m05",
    "title": "Seaborn",
    "icon": "🎨",
-   "color": "#f472b6",
+   "color": "#7a2d8f",
    "desc": "Gráficos estadísticos bonitos en una línea: distribuciones, categorías, relaciones y correlaciones.",
    "setup": "\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n_rng = np.random.default_rng(7)\n_n = 120\npropinas = pd.DataFrame({\n    \"cuenta\": np.round(_rng.gamma(4, 5, _n) + 5, 2),\n    \"dia\": _rng.choice([\"Jue\", \"Vie\", \"Sáb\", \"Dom\"], _n, p=[0.2, 0.2, 0.35, 0.25]),\n    \"momento\": _rng.choice([\"Almuerzo\", \"Cena\"], _n, p=[0.35, 0.65]),\n    \"fumador\": _rng.choice([\"Sí\", \"No\"], _n, p=[0.4, 0.6]),\n    \"personas\": _rng.integers(1, 7, _n),\n})\npropinas[\"propina\"] = np.round(propinas[\"cuenta\"] * _rng.uniform(0.08, 0.22, _n) + 0.5, 2)\ndel _rng, _n\n",
    "packages": [
@@ -1460,7 +2179,7 @@ window.PQ = {
    "id": "m06",
    "title": "Introducción a Machine Learning",
    "icon": "🤖",
-   "color": "#facc15",
+   "color": "#f0bf00",
    "desc": "Tu primer modelo con scikit-learn: preparar datos, entrenar, predecir y evaluar. Regresión y clasificación.",
    "setup": "\n_rng = np.random.default_rng(42)\n_n = 200\n_m2 = _rng.integers(35, 220, _n)\n_hab = np.clip(_m2 // 35 + _rng.integers(-1, 2, _n), 1, 6)\n_ant = _rng.integers(0, 60, _n)\n_barrio = _rng.choice([\"Centro\", \"Norte\", \"Sur\"], _n)\n_extra = np.select([_barrio == \"Centro\", _barrio == \"Norte\"], [40000, 15000], 0)\ncasas = pd.DataFrame({\n    \"m2\": _m2, \"habitaciones\": _hab, \"antiguedad\": _ant, \"barrio\": _barrio,\n    \"precio\": np.round(30000 + _m2 * 1800 + _hab * 5000 - _ant * 900 + _extra\n                       + _rng.normal(0, 15000, _n), -2),\n})\n_n = 300\nchurn = pd.DataFrame({\n    \"meses_cliente\": _rng.integers(1, 72, _n),\n    \"cargo_mensual\": np.round(_rng.uniform(15, 120, _n), 2),\n    \"reclamos\": _rng.poisson(1.2, _n),\n    \"contrato\": _rng.choice([\"Mensual\", \"Anual\"], _n, p=[0.6, 0.4]),\n})\n_logit = (-1.0 - 0.05 * churn[\"meses_cliente\"] + 0.03 * churn[\"cargo_mensual\"]\n          + 0.6 * churn[\"reclamos\"] + np.where(churn[\"contrato\"] == \"Mensual\", 1.2, -0.8))\nchurn[\"abandona\"] = (_rng.uniform(0, 1, _n) < 1 / (1 + np.exp(-_logit))).astype(int)\ndel _rng, _n, _m2, _hab, _ant, _barrio, _extra, _logit\n",
    "packages": [

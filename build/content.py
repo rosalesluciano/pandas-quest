@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Fuente única de contenido de PandasQuest.
 
-Temario: 01 Pandas · 02 DataFrames · 03 NumPy · 04 Matplotlib · 05 Seaborn · 06 Introducción a Machine Learning
+Temario: 00 Python desde cero · 01 Pandas · 02 DataFrames · 03 NumPy · 04 Matplotlib · 05 Seaborn · 06 Introducción a Machine Learning
 
 build.py genera a partir de aquí: js/data.js (web) y notebooks/*.ipynb (Colab).
 tests/test_content.py valida que cada solución pase y cada plantilla inicial falle.
@@ -166,6 +166,7 @@ churn["abandona"] = (_rng.uniform(0, 1, _n) < 1 / (1 + np.exp(-_logit))).astype(
 del _rng, _n, _m2, _hab, _ant, _barrio, _extra, _logit
 '''
 
+from mod_python import EXERCISES as EX_PY  # noqa: E402
 from mod_pandas import EXERCISES as EX_PANDAS  # noqa: E402
 from mod_dataframes import EXERCISES as EX_DF  # noqa: E402
 from mod_numpy import EXERCISES as EX_NUMPY  # noqa: E402
@@ -174,24 +175,27 @@ from mod_seaborn import EXERCISES as EX_SNS  # noqa: E402
 from mod_ml import EXERCISES as EX_ML  # noqa: E402
 
 MODULES = [
-    {"id": "m01", "title": "Pandas", "icon": "🐼", "color": "#22d3a0",
+    {"id": "m00", "title": "Python desde cero", "icon": "🐍", "color": "#e0700b",
+     "desc": "Variables, texto, listas, diccionarios, decisiones, bucles, funciones, errores y clases: la base para leer y escribir cualquier código.",
+     "tables": [], "exercises": EX_PY},
+    {"id": "m01", "title": "Pandas", "icon": "🐼", "color": "#0098cc",
      "desc": "Qué es pandas, Series, operaciones vectorizadas y tu primer contacto con tablas reales.",
      "tables": TABLES, "exercises": EX_PANDAS},
-    {"id": "m02", "title": "DataFrames", "icon": "📋", "color": "#38bdf8",
+    {"id": "m02", "title": "DataFrames", "icon": "📋", "color": "#d8231b",
      "desc": "Seleccionar, filtrar, limpiar, agrupar, unir y reestructurar tablas. Y conectarlas con bases de datos SQL.",
      "setup": DF_SETUP, "packages": ["sqlite3"], "tables": TABLES + ["trimestral"], "exercises": EX_DF},
-    {"id": "m03", "title": "NumPy", "icon": "🔢", "color": "#a78bfa",
+    {"id": "m03", "title": "NumPy", "icon": "🔢", "color": "#1d5bb0",
      "desc": "Arrays, indexado, cálculo vectorizado y broadcasting: el motor numérico debajo de pandas.",
      "setup": NUMPY_SETUP, "tables": ["temperaturas", "notas", "precios"], "exercises": EX_NUMPY},
-    {"id": "m04", "title": "Matplotlib", "icon": "📈", "color": "#fb923c",
+    {"id": "m04", "title": "Matplotlib", "icon": "📈", "color": "#00825a",
      "desc": "Líneas, barras, histogramas, dispersión y subplots. Convierte datos en gráficos claros.",
      "setup": PLT_SETUP, "packages": ["matplotlib"], "tables": ["meses", "ingresos", "gastos", "productos", "ventas_diarias"],
      "exercises": EX_PLT},
-    {"id": "m05", "title": "Seaborn", "icon": "🎨", "color": "#f472b6",
+    {"id": "m05", "title": "Seaborn", "icon": "🎨", "color": "#7a2d8f",
      "desc": "Gráficos estadísticos bonitos en una línea: distribuciones, categorías, relaciones y correlaciones.",
      "setup": SNS_SETUP, "packages": ["matplotlib", "micropip"], "micropip": ["seaborn"],
      "tables": ["propinas", "ventas_diarias"], "exercises": EX_SNS},
-    {"id": "m06", "title": "Introducción a Machine Learning", "icon": "🤖", "color": "#facc15",
+    {"id": "m06", "title": "Introducción a Machine Learning", "icon": "🤖", "color": "#f0bf00",
      "desc": "Tu primer modelo con scikit-learn: preparar datos, entrenar, predecir y evaluar. Regresión y clasificación.",
      "setup": ML_SETUP, "packages": ["scikit-learn"], "tables": ["casas", "churn"], "exercises": EX_ML},
 ]

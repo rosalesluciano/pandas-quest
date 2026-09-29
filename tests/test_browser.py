@@ -1,4 +1,4 @@
-"""Prueba end-to-end en Chromium real: resuelve los 75 ejercicios desde la interfaz.
+"""Prueba end-to-end en Chromium real: resuelve todos los ejercicios desde la interfaz.
 
 Uso:  python -m http.server 8765  (en la raíz)  y luego  python tests/test_browser.py [url] [carpeta_capturas]
 """
@@ -52,13 +52,8 @@ def main():
             page.wait_for_selector(".verdict", timeout=60000)
             if not page.query_selector(".verdict.ok"):
                 fails.append(f"{ex_id}: {page.inner_text('.verdict')[:300]}")
-            if ex_id in ("df23", "plt10", "sns10", "ml10"):
+            if ex_id in ("py27", "st04", "df34", "plt17", "sns10", "ml10"):
                 page.screenshot(path=os.path.join(SHOTS, f"ok_{ex_id}.png"), full_page=True)
-            # los modales de nivel/módulo aparecen tras la celebración: esperar y cerrarlos
-            page.wait_for_timeout(1300)
-            while page.query_selector("#modal:not(.hidden)"):
-                page.keyboard.press("Escape")
-                page.wait_for_timeout(100)
             print(f"{i + 1:02d} {ex_id} ok" if not fails or not fails[-1].startswith(ex_id) else f"{i + 1:02d} {ex_id} FALLA")
 
         st = page.evaluate("({xp: window.__pq.state.xp, n: Object.keys(window.__pq.state.solved).length, badges: Object.keys(window.__pq.state.badges)})")
@@ -96,7 +91,7 @@ def main():
         mp = ctx.new_page()
         mp.on("pageerror", lambda e: errors.append(f"mobile pageerror: {e}"))
         mp.goto(URL)
-        mp.wait_for_selector(".mod")
+        mp.wait_for_selector(".netmap")
         mp.screenshot(path=os.path.join(SHOTS, "mobile_home.png"), full_page=True)
         overflow = mp.evaluate("document.documentElement.scrollWidth > window.innerWidth")
         mp.goto(URL + "#/e/df19")
